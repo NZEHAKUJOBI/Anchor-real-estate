@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Crest } from "./Crest";
 import { navigation, society } from "@/lib/content";
@@ -107,12 +108,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <a
-            href="#join"
+          <Link
+            href="/join"
             className="label-sm hidden border border-gold-500/60 px-4 py-2.5 text-gold-300 transition-colors duration-200 hover:border-gold-400 hover:bg-gold-400 hover:text-forest-950 sm:inline-block"
           >
             Become a Member
-          </a>
+          </Link>
 
           <button
             type="button"
@@ -154,13 +155,13 @@ export function SiteHeader() {
               </li>
             ))}
             <li className="pt-4">
-              <a
-                href="#join"
+              <Link
+                href="/join"
                 onClick={() => setOpen(false)}
                 className="label-sm block bg-gold-400 px-4 py-3 text-center text-forest-950"
               >
                 Become a Member
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>

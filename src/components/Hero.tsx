@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Crest } from "./Crest";
 import { society } from "@/lib/content";
 
@@ -60,12 +61,12 @@ export function Hero() {
             </p>
 
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
-              <a
-                href="#join"
+              <Link
+                href="/join"
                 className="label bg-gold-400 px-7 py-4 text-center text-forest-950 transition-colors duration-200 hover:bg-gold-300"
               >
                 Become a Member
-              </a>
+              </Link>
               <a
                 href="#membership"
                 className="label border border-paper/25 px-7 py-4 text-center text-paper transition-colors duration-200 hover:border-paper/60 hover:bg-paper/5"

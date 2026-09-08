@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# keep the template committed; real values stay local
+!.env.example
+
+# local MongoDB data (npm run mongo:dev)
+.mongo-data/
+
+# local SMTP sink output (npm run mail:sink)
+smtp-sink.log

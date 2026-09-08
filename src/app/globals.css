@@ -27,6 +27,12 @@
   --color-ink-faint: #5f6863;
   --color-rule: #d9d4c5;
 
+  /* Admin state colours — kept muted so the palette stays institutional. */
+  --color-alert: #8c2f1e;
+  --color-alert-soft: #f4e4e0;
+  --color-ok: #1a5741;
+  --color-ok-soft: #dfeae4;
+
   --font-display: var(--font-source-serif), ui-serif, Georgia, "Times New Roman",
     serif;
   --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, -apple-system,

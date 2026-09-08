@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Reveal } from "./Reveal";
 import { SectionHeading } from "./SectionHeading";
 import { email, joinCaveat, joinSteps, phones } from "@/lib/content";
@@ -46,9 +47,15 @@ export function HowToJoin() {
                   Register your interest with the Secretariat
                 </h3>
                 <p className="mt-4 max-w-md text-[1.0625rem] leading-relaxed text-paper/70">
-                  Speak to the Society directly. Membership documentation
-                  follows once the Board finalises it.
+                  Complete the short form and we will be in touch. Membership
+                  documentation follows once the Board finalises it.
                 </p>
+                <Link
+                  href="/join"
+                  className="label mt-8 inline-block bg-gold-400 px-7 py-4 text-forest-950 transition-colors duration-200 hover:bg-gold-300"
+                >
+                  Register Your Interest
+                </Link>
               </div>
 
               <div className="lg:col-span-6">
