@@ -29,18 +29,18 @@ const plexMono = IBM_Plex_Mono({
 });
 
 const description =
-  "A member-owned multipurpose cooperative society in Abuja, FCT. Ownership slots of ₦5,000, a ₦5 billion mobilization target, and member capital deployed across housing, tourism, warehousing and financial inclusion.";
+  "A member-owned multipurpose cooperative society limited in Abuja, FCT. Ownership slots of ₦5,000, a ₦5 billion mobilization target, and member capital deployed across housing, tourism, warehousing and financial inclusion.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://anchorrealestategroup.ng"),
   title: {
-    default: "Anchor Real Estate Group — Multipurpose Cooperative Society",
+    default: "Anchor Real Estate Group — Multipurpose Cooperative Society Limited",
     template: "%s · Anchor Real Estate Group",
   },
   description,
   applicationName: "Anchor Real Estate Group",
   keywords: [
-    "cooperative society Abuja",
+    "cooperative society limited Abuja",
     "real estate cooperative Nigeria",
     "multipurpose cooperative FCT",
     "property ownership Abuja",
@@ -52,12 +52,12 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_NG",
     siteName: "Anchor Real Estate Group",
-    title: "Anchor Real Estate Group — Multipurpose Cooperative Society",
+    title: "Anchor Real Estate Group — Multipurpose Cooperative Society Limited",
     description,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Anchor Real Estate Group — Multipurpose Cooperative Society",
+    title: "Anchor Real Estate Group — Multipurpose Cooperative Society Limited",
     description,
   },
   robots: { index: true, follow: true },

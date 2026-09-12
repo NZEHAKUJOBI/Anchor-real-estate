@@ -7,7 +7,7 @@ import { joinSteps, society } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Register Your Interest",
   description:
-    "Register your interest in membership of Anchor Real Estate Group, a multipurpose cooperative society in Abuja. Ownership slots of ₦5,000, from 100 to 10,000 per member.",
+    "Register your interest in membership of Anchor Real Estate Group, a multipurpose cooperative society limited in Abuja. Ownership slots of ₦5,000, from 100 to 10,000 per member.",
 };
 
 export default function JoinPage() {

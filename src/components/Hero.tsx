@@ -54,7 +54,7 @@ export function Hero() {
             <div aria-hidden="true" className="mt-9 h-px w-24 bg-gold-500/50" />
 
             <p className="mt-9 max-w-xl text-[1.0625rem] leading-[1.7] text-pretty text-paper/75">
-              A member-owned cooperative society in Abuja, mobilising ₦5 billion
+              A member-owned cooperative society limited in Abuja, mobilising ₦5 billion
               of member capital into housing, tourism, warehousing and financial
               inclusion across the Federal Capital Territory — and giving every
               member a documented stake in what that capital builds.

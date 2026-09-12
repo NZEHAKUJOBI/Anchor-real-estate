@@ -85,7 +85,7 @@ function shell(heading: string, body: string): string {
     ${body}
   </td></tr>
   <tr><td style="padding:20px 32px;border-top:1px solid ${BRAND.rule};font:400 12px/1.6 'Helvetica Neue',Arial,sans-serif;color:${BRAND.soft};">
-    Anchor Real Estate Group — Multipurpose Cooperative Society<br>
+    Anchor Real Estate Group — Multipurpose Cooperative Society Limited<br>
     124 Sherifat Adenusi Crescent, ACO Estate, Life Camp, Abuja–FCT<br>
     Tier 1 Cooperative · FCTA By-Laws No. R11913
   </td></tr>
@@ -154,7 +154,7 @@ export function applicantReceipt(enquiry: EnquiryDoc): Mail {
 
   const text = `Dear ${enquiry.firstName},
 
-Thank you for registering your interest in Anchor Real Estate Group, a multipurpose cooperative society in Abuja.
+Thank you for registering your interest in Anchor Real Estate Group, a multipurpose cooperative society limited in Abuja.
 
 We have recorded your enquiry under reference ${enquiry.reference}. A member of the Secretariat will be in touch.
 
@@ -172,7 +172,7 @@ Anchor Real Estate Group
   const html = shell(
     "We have your enquiry",
     `<p style="margin:0 0 16px;">Dear ${escapeHtml(enquiry.firstName)},</p>
-<p style="margin:0 0 16px;">Thank you for registering your interest in Anchor Real Estate Group, a multipurpose cooperative society in Abuja. Your enquiry is recorded under reference <strong>${escapeHtml(enquiry.reference)}</strong>, and a member of the Secretariat will be in touch.</p>
+<p style="margin:0 0 16px;">Thank you for registering your interest in Anchor Real Estate Group, a multipurpose cooperative society limited in Abuja. Your enquiry is recorded under reference <strong>${escapeHtml(enquiry.reference)}</strong>, and a member of the Secretariat will be in touch.</p>
 <p style="margin:24px 0 0;font:600 11px/1.4 'Helvetica Neue',Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:${BRAND.gold};">What you submitted</p>
 ${rows(pairs)}
 <p style="margin:24px 0 0;font:600 11px/1.4 'Helvetica Neue',Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:${BRAND.gold};">What happens next</p>

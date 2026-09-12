@@ -1,7 +1,7 @@
 # Anchor Real Estate Group
 
 Public site and Secretariat admin dashboard for **Anchor Real Estate Group**, a
-multipurpose cooperative society in Abuja, Federal Capital Territory (Tier 1
+multipurpose cooperative society limited in Abuja, Federal Capital Territory (Tier 1
 Cooperative, FCTA By-Laws No. R11913).
 
 The Society is not a developer or an estate agency. It mobilises member capital

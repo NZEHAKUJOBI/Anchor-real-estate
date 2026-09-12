@@ -10,7 +10,7 @@
 
 export const society = {
   name: "Anchor Real Estate Group",
-  kind: "Multipurpose Cooperative Society",
+  kind: "Multipurpose Cooperative Society Limited",
   tagline: "Building Shared Prosperity Through Real Estate",
   location: "Abuja, Federal Capital Territory, Nigeria",
   established: "2026",

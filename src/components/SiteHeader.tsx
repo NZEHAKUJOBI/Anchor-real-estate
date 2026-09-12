@@ -76,7 +76,7 @@ export function SiteHeader() {
               {society.name}
             </span>
             <span className="label-sm block text-gold-400/75">
-              Cooperative Society
+              Cooperative Society Limited
             </span>
           </span>
         </a>
