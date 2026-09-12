@@ -15,24 +15,43 @@ import { formatNaira, formatNumber } from "./money";
 
 let cached: Transporter | null = null;
 
+function cleanHost(host: string | undefined): string | undefined {
+  if (!host) return undefined;
+  let cleaned = host.trim().replace(/^https?:\/\//i, "").replace(/^\/\//, "").replace(/\/.*$/, "");
+  if (cleaned.toLowerCase() === "resend.com") {
+    cleaned = "smtp.resend.com";
+  }
+  return cleaned;
+}
+
+export function resendApiKey(): string | undefined {
+  if (process.env.RESEND_API_KEY?.trim()) return process.env.RESEND_API_KEY.trim();
+  if (process.env.SMTP_PASS?.trim().startsWith("re_")) return process.env.SMTP_PASS.trim();
+  return undefined;
+}
+
 export function isMailConfigured(): boolean {
-  return Boolean(process.env.SMTP_HOST && process.env.MAIL_FROM);
+  return Boolean(
+    (resendApiKey() && process.env.MAIL_FROM) ||
+      (process.env.SMTP_HOST && process.env.MAIL_FROM),
+  );
 }
 
 function transporter(): Transporter {
   if (cached) return cached;
 
+  const host = cleanHost(process.env.SMTP_HOST);
   const port = Number(process.env.SMTP_PORT ?? 587);
 
   cached = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
+    host,
     port,
     // 465 is implicit TLS; 587 upgrades via STARTTLS.
     secure: process.env.SMTP_SECURE
       ? process.env.SMTP_SECURE === "true"
       : port === 465,
     auth: process.env.SMTP_USER
-      ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+      ? { user: process.env.SMTP_USER.trim(), pass: process.env.SMTP_PASS?.trim() }
       : undefined,
     connectionTimeout: 10_000,
     greetingTimeout: 10_000,
@@ -40,6 +59,51 @@ function transporter(): Transporter {
   });
 
   return cached;
+}
+
+type SendParams = {
+  from: string;
+  to: string;
+  replyTo?: string;
+  subject: string;
+  text: string;
+  html: string;
+};
+
+async function sendMailMessage(params: SendParams): Promise<void> {
+  const apiKey = resendApiKey();
+  if (apiKey) {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: params.from,
+        to: [params.to],
+        reply_to: params.replyTo ? [params.replyTo] : undefined,
+        subject: params.subject,
+        text: params.text,
+        html: params.html,
+      }),
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Resend HTTP ${res.status}: ${body}`);
+    }
+    return;
+  }
+
+  await transporter().sendMail({
+    from: params.from,
+    to: params.to,
+    replyTo: params.replyTo,
+    subject: params.subject,
+    text: params.text,
+    html: params.html,
+  });
 }
 
 /** Only used by tests, which stand up a throwaway SMTP server per run. */
@@ -239,7 +303,7 @@ export async function sendEnquiryMail(enquiry: EnquiryDoc): Promise<SendOutcome>
   const results = await Promise.allSettled([
     (async () => {
       const message = applicantReceipt(enquiry);
-      await transporter().sendMail({
+      await sendMailMessage({
         from,
         to: enquiry.email,
         replyTo: secretariat,
@@ -251,7 +315,7 @@ export async function sendEnquiryMail(enquiry: EnquiryDoc): Promise<SendOutcome>
     (async () => {
       if (!secretariat) return "skipped";
       const message = secretariatNotice(enquiry);
-      await transporter().sendMail({
+      await sendMailMessage({
         from,
         to: secretariat,
         replyTo: `${enquiry.firstName} ${enquiry.lastName} <${enquiry.email}>`,
