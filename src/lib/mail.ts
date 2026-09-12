@@ -61,42 +61,42 @@ function transporter(): Transporter {
   return cached;
 }
 
-export function cleanFromAddress(from: string | undefined): string {
-  if (!from) return "Anchor Real Estate Group <onboarding@resend.dev>";
-  let cleaned = from.trim().replace(/^["']+|["']+$/g, "").trim();
+export function cleanFromAddress(raw: string | undefined): string {
+  const FALLBACK = "Anchor Real Estate Group <onboarding@resend.dev>";
+  if (!raw) return FALLBACK;
 
-  // If quotes were inside, like "Anchor Real Estate Group" <email@...>
-  const bracketMatch = cleaned.match(/^(?:"?([^"<>]+)"?\s+)?<([^<>]+)>$/);
-  if (bracketMatch) {
-    const name = bracketMatch[1]?.trim().replace(/^["']+|["']+$/g, "").trim();
-    const email = bracketMatch[2].trim().replace(/^["']+|["']+$/g, "").trim();
+  // Strip ALL quote characters everywhere, then trim
+  let s = raw.replace(/["""''`]/g, "").trim();
+
+  // Extract email from angle brackets: Name <email@domain>
+  const angleMatch = s.match(/^(.*?)\s*<\s*([^<>\s]+@[^<>\s]+)\s*>$/);
+  if (angleMatch) {
+    const name = angleMatch[1].trim();
+    const email = angleMatch[2].trim();
     return name ? `${name} <${email}>` : email;
   }
 
-  // Bare email address without brackets
-  if (/^[^\s<>@]+@[^\s<>@]+$/.test(cleaned)) {
-    return cleaned;
+  // Bare email: user@domain.com
+  if (/^[^\s<>]+@[^\s<>]+\.[^\s<>]+$/.test(s)) {
+    return s;
   }
 
-  // If text without @, fallback with onboarding@resend.dev
-  if (!cleaned.includes("@")) {
-    return `${cleaned} <onboarding@resend.dev>`;
-  }
-
-  return cleaned;
+  // Nothing valid — return the fallback
+  return FALLBACK;
 }
 
 export function cleanEmailAddress(addr: string | undefined): string | undefined {
   if (!addr) return undefined;
-  let cleaned = addr.trim().replace(/^["']+|["']+$/g, "").trim();
-  const match = cleaned.match(/<([^<>]+)>/);
+  let s = addr.replace(/["""''`]/g, "").trim();
+  const match = s.match(/<\s*([^<>\s]+@[^<>\s]+)\s*>/);
   if (match) return match[1].trim();
-  return cleaned;
+  if (/^[^\s<>]+@[^\s<>]+$/.test(s)) return s;
+  return undefined;
 }
 
 function cleanReplyTo(addr: string | undefined): string | undefined {
   if (!addr) return undefined;
-  return addr.trim().replace(/^["']+|["']+$/g, "").trim();
+  return addr.replace(/["""''`]/g, "").trim() || undefined;
 }
 
 type SendParams = {
@@ -112,6 +112,8 @@ async function sendMailMessage(params: SendParams): Promise<void> {
   const from = cleanFromAddress(params.from);
   const to = params.to.trim();
   const replyTo = cleanReplyTo(params.replyTo);
+
+  console.log("[mail] sending — raw from:", JSON.stringify(params.from), "→ cleaned:", JSON.stringify(from), "to:", to);
 
   const apiKey = resendApiKey();
   if (apiKey) {
