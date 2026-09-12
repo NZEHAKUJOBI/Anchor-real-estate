@@ -63,7 +63,7 @@ const dateOnly = trimmed
   });
 
 export const loginSchema = z.object({
-  email: trimmed.min(1, "Enter your email.").pipe(z.email("Enter a valid email.")),
+  email: trimmed.min(1, "Enter your email or username."),
   password: z.string().min(1, "Enter your password."),
 });
 
@@ -187,7 +187,7 @@ export const adminUserSchema = z.object({
   email: trimmed.min(1, "Enter an email.").pipe(z.email("Enter a valid email.")),
   password: z
     .string()
-    .min(12, "Use at least 12 characters.")
+    .min(6, "Use at least 6 characters.")
     .max(200, "That password is too long."),
   role: z.enum(ROLES),
 });

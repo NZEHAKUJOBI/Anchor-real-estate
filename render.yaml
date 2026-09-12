@@ -7,7 +7,7 @@ services:
     plan: starter
     region: frankfurt
     buildCommand: npm ci && npm run build
-    startCommand: npm run start
+    startCommand: npm run seed:admin && npm run start
     healthCheckPath: /
     autoDeployTrigger: commit
     envVars:
@@ -23,6 +23,15 @@ services:
       # signs every administrator out.
       - key: SESSION_SECRET
         generateValue: true
+      # Admin auto-seed credentials for autodeployment
+      - key: SEED_ADMIN_NAME
+        value: Admin
+      - key: SEED_ADMIN_EMAIL
+        value: admin@anchorrealestategroup.ng
+      - key: SEED_ADMIN_PASSWORD
+        value: "123456789"
+      - key: SEED_ADMIN_ROLE
+        value: admin
       # Outbound mail for enquiry receipts. Port 25 is blocked on Render;
       # use 587 (STARTTLS) or 465 (implicit TLS). With Gmail, SMTP_PASS must
       # be a Google App Password, not the account password.

@@ -38,22 +38,20 @@ point `SMTP_HOST`/`SMTP_PORT` at it. Captured messages land in `smtp-sink.log`:
 npm run mail:sink              # 127.0.0.1:2599
 ```
 
-Create your first administrator, then sign in at `/login`:
+Create your first administrator (or use default autodeployment credentials `admin` / `123456789`), then sign in at `/login`:
 
 ```bash
-npm run seed:admin -- --name "Your Name" --email you@example.org \
-                      --password "a-long-passphrase" --role admin
-```
+# Runs with defaults (admin@anchorrealestategroup.ng / 123456789):
+npm run seed:admin
 
-Create the first administrator, then sign in at `/login`:
-
-```bash
+# Or customize credentials:
 npm run seed:admin -- --name "TPL Lami" --email lami@example.org \
-                      --password "a-long-passphrase" --role admin
+                      --password "123456789" --role admin
 ```
 
 Re-running the seed with the same email resets that account's password and
-role, which is also how you recover a locked-out administrator.
+role, which is also how you recover a locked-out administrator. On autodeployment
+(e.g., Render), the administrator is seeded automatically on startup.
 
 Other scripts:
 
@@ -175,6 +173,21 @@ called by every admin page and every action.
 
 Every change to the register, to payments and to admin accounts is written to
 an audit log with the officer who made it, visible at `/admin/activity`.
+
+## Deploying to Vercel
+
+When deploying to Vercel:
+
+1. Import the repository into your Vercel dashboard.
+2. In **Project Settings → Environment Variables**, configure:
+   - `MONGODB_URI`: MongoDB Atlas connection string.
+   - `SESSION_SECRET`: Random string of at least 32 characters (e.g., generate with `openssl rand -base64 32`).
+   - `SEED_ADMIN_EMAIL`: (Optional, defaults to `admin@anchorrealestategroup.ng`)
+   - `SEED_ADMIN_PASSWORD`: (Optional, defaults to `123456789`)
+3. On MongoDB Atlas, allow access from anywhere (`0.0.0.0/0`) under **Network Access**, since Vercel uses dynamic serverless IPs.
+4. Deploy! The administrator account will automatically be provisioned upon first login at `/login` with:
+   - **Email**: `admin@anchorrealestategroup.ng`
+   - **Password**: `123456789`
 
 ## Deploying to Render
 

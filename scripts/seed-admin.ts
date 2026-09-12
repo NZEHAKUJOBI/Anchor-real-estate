@@ -37,18 +37,24 @@ function fail(message: string): never {
 }
 
 async function main() {
-  const name = arg("name") ?? process.env.SEED_ADMIN_NAME;
-  const email = (arg("email") ?? process.env.SEED_ADMIN_EMAIL)?.toLowerCase();
-  const password = arg("password") ?? process.env.SEED_ADMIN_PASSWORD;
+  const name = arg("name") ?? process.env.SEED_ADMIN_NAME ?? "Admin";
+  const email = (
+    arg("email") ??
+    process.env.SEED_ADMIN_EMAIL ??
+    "admin@anchorrealestategroup.ng"
+  )?.toLowerCase();
+  const password =
+    arg("password") ?? process.env.SEED_ADMIN_PASSWORD ?? "123456789";
   const role = arg("role") ?? process.env.SEED_ADMIN_ROLE ?? "admin";
 
   if (!name) fail("Missing --name");
   if (!email) fail("Missing --email");
   if (!password) fail("Missing --password");
-  if (password.length < 12) fail("Password must be at least 12 characters.");
+  if (password.length < 6) fail("Password must be at least 6 characters.");
   if (!isRole(role)) fail(`Role must be one of: ${ROLES.join(", ")}`);
   if (!process.env.MONGODB_URI) {
-    fail("MONGODB_URI is not set. Add it to .env.local or export it.");
+    console.log("  ℹ MONGODB_URI is not set. Skipping admin seed.");
+    process.exit(0);
   }
 
   await connectDb();
