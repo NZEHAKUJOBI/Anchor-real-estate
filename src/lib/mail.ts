@@ -61,6 +61,44 @@ function transporter(): Transporter {
   return cached;
 }
 
+export function cleanFromAddress(from: string | undefined): string {
+  if (!from) return "Anchor Real Estate Group <onboarding@resend.dev>";
+  let cleaned = from.trim().replace(/^["']+|["']+$/g, "").trim();
+
+  // If quotes were inside, like "Anchor Real Estate Group" <email@...>
+  const bracketMatch = cleaned.match(/^(?:"?([^"<>]+)"?\s+)?<([^<>]+)>$/);
+  if (bracketMatch) {
+    const name = bracketMatch[1]?.trim().replace(/^["']+|["']+$/g, "").trim();
+    const email = bracketMatch[2].trim().replace(/^["']+|["']+$/g, "").trim();
+    return name ? `${name} <${email}>` : email;
+  }
+
+  // Bare email address without brackets
+  if (/^[^\s<>@]+@[^\s<>@]+$/.test(cleaned)) {
+    return cleaned;
+  }
+
+  // If text without @, fallback with onboarding@resend.dev
+  if (!cleaned.includes("@")) {
+    return `${cleaned} <onboarding@resend.dev>`;
+  }
+
+  return cleaned;
+}
+
+export function cleanEmailAddress(addr: string | undefined): string | undefined {
+  if (!addr) return undefined;
+  let cleaned = addr.trim().replace(/^["']+|["']+$/g, "").trim();
+  const match = cleaned.match(/<([^<>]+)>/);
+  if (match) return match[1].trim();
+  return cleaned;
+}
+
+function cleanReplyTo(addr: string | undefined): string | undefined {
+  if (!addr) return undefined;
+  return addr.trim().replace(/^["']+|["']+$/g, "").trim();
+}
+
 type SendParams = {
   from: string;
   to: string;
@@ -71,6 +109,10 @@ type SendParams = {
 };
 
 async function sendMailMessage(params: SendParams): Promise<void> {
+  const from = cleanFromAddress(params.from);
+  const to = params.to.trim();
+  const replyTo = cleanReplyTo(params.replyTo);
+
   const apiKey = resendApiKey();
   if (apiKey) {
     const res = await fetch("https://api.resend.com/emails", {
@@ -80,9 +122,9 @@ async function sendMailMessage(params: SendParams): Promise<void> {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: params.from,
-        to: [params.to],
-        reply_to: params.replyTo ? [params.replyTo] : undefined,
+        from,
+        to: [to],
+        reply_to: replyTo ? [replyTo] : undefined,
         subject: params.subject,
         text: params.text,
         html: params.html,
@@ -97,9 +139,9 @@ async function sendMailMessage(params: SendParams): Promise<void> {
   }
 
   await transporter().sendMail({
-    from: params.from,
-    to: params.to,
-    replyTo: params.replyTo,
+    from,
+    to,
+    replyTo,
     subject: params.subject,
     text: params.text,
     html: params.html,
@@ -118,7 +160,8 @@ export function siteUrl(): string {
 }
 
 export function secretariatAddress(): string | undefined {
-  return process.env.SECRETARIAT_EMAIL ?? process.env.MAIL_FROM;
+  const raw = process.env.SECRETARIAT_EMAIL ?? process.env.MAIL_FROM;
+  return cleanEmailAddress(raw);
 }
 
 type Mail = { subject: string; text: string; html: string };
