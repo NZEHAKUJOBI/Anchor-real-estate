@@ -29,7 +29,7 @@ export default function JoinPage() {
             href="/"
             className="inline-flex items-center gap-3 text-paper transition-opacity hover:opacity-85"
           >
-            <Crest className="h-9 w-9 text-gold-400" />
+            <Crest size={36} className="h-9 w-9" />
             <span>
               <span className="font-display block text-[0.9375rem] leading-tight">
                 {society.name}
