@@ -288,7 +288,7 @@ export const offices = [
 
 export const phones = ["+234 902 525 0026", "+234 803 612 5057"];
 
-export const email = { address: "babdayo111@gmail.com", provisional: true };
+export const email = { address: "info@anchorcooperativeltd.com", provisional: false };
 
 export const bankers = [
   { name: "First City Monument Bank", short: "FCMB" },
