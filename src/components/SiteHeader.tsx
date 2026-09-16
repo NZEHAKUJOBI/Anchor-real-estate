@@ -70,7 +70,11 @@ export function SiteHeader() {
           className="group flex items-center gap-3 text-paper"
           aria-label={`${society.name} — back to top`}
         >
-          <Crest className="h-8 w-8 shrink-0 text-gold-400 transition-colors duration-300 group-hover:text-gold-300" />
+          <Crest
+            size={32}
+            priority
+            className="h-8 w-8 shrink-0 transition-opacity duration-300 group-hover:opacity-80"
+          />
           <span className="hidden sm:block">
             <span className="font-display block text-[0.9375rem] leading-tight tracking-[0.005em]">
               {society.name}

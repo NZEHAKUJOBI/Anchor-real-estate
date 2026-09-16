@@ -1,40 +1,35 @@
+import Image from "next/image";
+import logo from "@/app/logo.png";
+
 /**
- * Society crest — a double ring enclosing a rooftop chevron over an anchor.
- * Drawn as stroked geometry so it stays crisp at masthead and footer sizes.
+ * Society crest — the cooperative's seal, a gold anchor and portico on a forest
+ * field. The artwork is masked to its circle with transparent corners, so it
+ * sits directly on the forest ground with no plate behind it.
+ *
+ * `className` handles layout as before; `size` is the intrinsic width Next.js
+ * optimises for, so set it to the largest CSS size the call site renders.
+ * The seal is decorative wherever the society name sits beside it, which is
+ * every current call site — pass `alt` only if that stops being true.
  */
-export function Crest({ className }: { className?: string }) {
+export function Crest({
+  className,
+  size = 64,
+  priority = false,
+  alt = "",
+}: {
+  className?: string;
+  size?: number;
+  priority?: boolean;
+  alt?: string;
+}) {
   return (
-    <svg
-      viewBox="0 0 100 100"
+    <Image
+      src={logo}
+      alt={alt}
+      width={size}
+      height={size}
+      priority={priority}
       className={className}
-      role="img"
-      aria-label="Anchor Real Estate Group crest"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      vectorEffect="non-scaling-stroke"
-    >
-      {/* Outer and inner rings */}
-      <circle cx="50" cy="50" r="46.5" stroke="currentColor" strokeWidth="1.6" />
-      <circle cx="50" cy="50" r="41" stroke="currentColor" strokeWidth="0.7" opacity="0.65" />
-
-      {/* Rooftop */}
-      <path d="M32 26.5 L50 15.5 L68 26.5" stroke="currentColor" strokeWidth="1.9" />
-
-      {/* Anchor: ring, shank, stock, crown */}
-      <circle cx="50" cy="35.5" r="3.6" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M50 39.2 V 70.5" stroke="currentColor" strokeWidth="1.9" />
-      <path d="M38.5 46 H 61.5" stroke="currentColor" strokeWidth="1.6" />
-      <path
-        d="M35 59 C 35 69.5 41.5 75 50 75 C 58.5 75 65 69.5 65 59"
-        stroke="currentColor"
-        strokeWidth="1.9"
-      />
-      <path d="M35 59 L 30.5 55.5 M65 59 L 69.5 55.5" stroke="currentColor" strokeWidth="1.6" />
-
-      {/* Flanking pips */}
-      <circle cx="22.5" cy="50" r="1.5" fill="currentColor" />
-      <circle cx="77.5" cy="50" r="1.5" fill="currentColor" />
-    </svg>
+    />
   );
 }

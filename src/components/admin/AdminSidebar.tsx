@@ -28,7 +28,7 @@ export function AdminSidebar({
       {/* Compact bar, below lg */}
       <div className="flex items-center justify-between border-b border-gold-500/25 bg-forest-950 px-5 py-3 lg:hidden">
         <Link href="/admin" className="flex items-center gap-3 text-paper">
-          <Crest className="h-7 w-7 text-gold-400" />
+          <Crest size={28} className="h-7 w-7" />
           <span className="label-sm">Anchor Admin</span>
         </Link>
         <button
@@ -65,7 +65,7 @@ export function AdminSidebar({
             href="/admin"
             className="hidden items-center gap-3 px-6 py-6 text-paper lg:flex"
           >
-            <Crest className="h-9 w-9 shrink-0 text-gold-400" />
+            <Crest size={36} className="h-9 w-9 shrink-0" />
             <span>
               <span className="font-display block text-[0.9375rem] leading-tight">
                 Anchor Admin

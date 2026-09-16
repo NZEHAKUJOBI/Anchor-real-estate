@@ -83,7 +83,7 @@ export function Hero() {
                   aria-hidden="true"
                   className="absolute h-[17rem] w-[17rem] rounded-full border border-gold-400/15 sm:h-[21rem] sm:w-[21rem]"
                 />
-                <Crest className="h-40 w-40 text-gold-400 sm:h-52 sm:w-52" />
+                <Crest size={208} priority className="h-40 w-40 sm:h-52 sm:w-52" />
               </div>
 
               <dl className="grid w-full max-w-sm grid-cols-3 border-t border-gold-400/20">

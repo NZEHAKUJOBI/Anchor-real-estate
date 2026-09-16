@@ -27,7 +27,7 @@ export default async function LoginPage({
 
       <div className="relative w-full max-w-sm">
         <div className="flex flex-col items-center text-center">
-          <Crest className="h-14 w-14 text-gold-400" />
+          <Crest size={56} priority className="h-14 w-14" />
           <h1 className="font-display mt-6 text-[1.5rem] leading-tight text-paper">
             Anchor Real Estate Group
           </h1>

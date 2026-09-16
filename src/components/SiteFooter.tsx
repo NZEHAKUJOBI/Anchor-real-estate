@@ -18,7 +18,7 @@ export function SiteFooter() {
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-4">
             <div className="flex items-center gap-4">
-              <Crest className="h-11 w-11 shrink-0 text-gold-400" />
+              <Crest size={44} className="h-11 w-11 shrink-0" />
               <div>
                 <p className="font-display text-[1.0625rem] leading-tight">
                   {society.name}
