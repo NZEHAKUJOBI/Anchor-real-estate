@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Crest } from "@/components/Crest";
 import { ROLE_LABEL, type Role } from "@/lib/rbac";
 
-export type NavItem = { href: string; label: string };
+export type NavItem = { href: string; label: string; badge?: number | string };
 
 export function AdminSidebar({
   items,
@@ -86,13 +86,18 @@ export function AdminSidebar({
                       href={item.href}
                       onClick={() => setOpen(false)}
                       aria-current={current ? "page" : undefined}
-                      className={`label-sm block border-l-2 px-4 py-3 transition-colors duration-150 ${
+                      className={`label-sm flex items-center justify-between border-l-2 px-4 py-3 transition-colors duration-150 ${
                         current
                           ? "border-gold-400 bg-paper/8 text-gold-300"
                           : "border-transparent text-paper/65 hover:bg-paper/5 hover:text-paper"
                       }`}
                     >
-                      {item.label}
+                      <span>{item.label}</span>
+                      {item.badge ? (
+                        <span className="ml-2 inline-flex items-center justify-center rounded-full bg-gold-400 px-2 py-0.5 text-[0.7rem] font-bold text-forest-950">
+                          {item.badge}
+                        </span>
+                      ) : null}
                     </Link>
                   </li>
                 );

@@ -13,6 +13,7 @@ import { requirePermission } from "@/lib/auth";
 import { can } from "@/lib/rbac";
 import { connectDb } from "@/lib/db";
 import { Enquiry } from "@/lib/models/Enquiry";
+import { MailMessage } from "@/lib/models/MailMessage";
 import {
   ENQUIRY_STATUS_LABEL,
   SLOT_PRICE_KOBO,
@@ -51,17 +52,41 @@ export default async function EnquiryDetailPage({
   const enquiry = await Enquiry.findById(id).lean();
   if (!enquiry) notFound();
 
+  const correspondence = await MailMessage.find({
+    $or: [
+      { enquiry: id },
+      { fromEmail: enquiry.email.toLowerCase() },
+      { toEmail: enquiry.email.toLowerCase() },
+    ],
+  })
+    .sort({ createdAt: -1 })
+    .limit(8)
+    .lean();
+
   return (
     <>
       <PageHeader
         title={`${enquiry.firstName} ${enquiry.lastName}`}
         description={`${enquiry.reference} · received ${enquiry.createdAt.toLocaleDateString("en-NG", dateFormat)}`}
         action={
-          enquiry.member ? (
-            <ButtonLink href={`/admin/members/${String(enquiry.member)}`} variant="ghost">
-              View Member Record
-            </ButtonLink>
-          ) : undefined
+          <div className="flex flex-wrap items-center gap-3">
+            {can(session.role, "mail:write") ? (
+              <ButtonLink
+                href={`/admin/mail/compose?enquiryId=${id}&to=${encodeURIComponent(enquiry.email)}`}
+                variant="gold"
+              >
+                Send Email
+              </ButtonLink>
+            ) : null}
+            {enquiry.member ? (
+              <ButtonLink
+                href={`/admin/members/${String(enquiry.member)}`}
+                variant="ghost"
+              >
+                View Member Record
+              </ButtonLink>
+            ) : null}
+          </div>
         }
       />
 
@@ -180,6 +205,58 @@ export default async function EnquiryDetailPage({
           )}
         </div>
       </div>
+
+      {correspondence.length > 0 ? (
+        <div className="mt-12 border-t border-rule pt-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-[1.25rem] text-forest-900">
+              Email Correspondence ({correspondence.length})
+            </h2>
+            {can(session.role, "mail:write") ? (
+              <ButtonLink
+                href={`/admin/mail/compose?enquiryId=${id}&to=${encodeURIComponent(enquiry.email)}`}
+                variant="ghost"
+              >
+                + Write Email
+              </ButtonLink>
+            ) : null}
+          </div>
+          <div className="space-y-3">
+            {correspondence.map((msg) => (
+              <div
+                key={String(msg._id)}
+                className="flex items-center justify-between border border-rule bg-white p-4 text-[0.875rem]"
+              >
+                <div className="min-w-0 flex-1 pr-4">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-forest-950">
+                      {msg.direction === "inbound"
+                        ? "From Applicant"
+                        : "From Secretariat"}
+                    </span>
+                    <span className="text-ink-soft">·</span>
+                    <span className="text-ink truncate">{msg.subject}</span>
+                  </div>
+                  <p className="mt-1 text-[0.8125rem] text-ink-soft truncate">
+                    {msg.bodyText.slice(0, 120)}
+                  </p>
+                </div>
+                <div className="shrink-0 flex items-center gap-3">
+                  <span className="text-[0.75rem] text-ink-faint">
+                    {new Date(msg.createdAt).toLocaleDateString("en-NG", dateFormat)}
+                  </span>
+                  <Link
+                    href={`/admin/mail/${String(msg._id)}`}
+                    className="label-sm text-forest-900 underline hover:text-gold-600"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       <p className="mt-12">
         <Link

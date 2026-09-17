@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { connectDb } from "@/lib/db";
 import { Enquiry, nextEnquiryReference } from "@/lib/models/Enquiry";
+import { MailMessage } from "@/lib/models/MailMessage";
 import { sendEnquiryMail } from "@/lib/mail";
 import { enquirySchema, fieldErrorsOf } from "@/lib/validation";
 import { duplicateKeyField } from "@/lib/mongoErrors";
@@ -102,6 +103,26 @@ export async function submitEnquiry(
       submittedIp: ip,
       status: "new",
     });
+
+    // Also record as an inbound message in the Admin Mailbox
+    try {
+      await MailMessage.create({
+        direction: "inbound",
+        from: `${input.firstName} ${input.lastName} <${input.email.toLowerCase()}>`,
+        fromEmail: input.email.toLowerCase(),
+        to: ["Anchor Secretariat <secretariat@anchorrealestategroup.ng>"],
+        toEmail: ["secretariat@anchorrealestategroup.ng"],
+        subject: `New Enquiry — ${input.firstName} ${input.lastName} (${enquiry.reference})`,
+        bodyText: input.message
+          ? `${input.message}\n\n[Tier Interest: ${input.tierInterest}, Phone: ${input.phone}, Ref: ${enquiry.reference}]`
+          : `Registration of interest received via website form.\n\n[Tier Interest: ${input.tierInterest}, Phone: ${input.phone}, Ref: ${enquiry.reference}]`,
+        status: "received",
+        isRead: false,
+        enquiry: enquiry._id,
+      });
+    } catch (mailErr) {
+      console.warn("[enquiry] failed to create inbox message for enquiry", mailErr);
+    }
 
     // The enquiry is already safe in the database. Mail is attempted after,
     // and its outcome is recorded rather than thrown, so a mail outage can

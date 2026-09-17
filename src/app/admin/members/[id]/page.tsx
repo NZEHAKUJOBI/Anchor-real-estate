@@ -19,6 +19,7 @@ import { can } from "@/lib/rbac";
 import { connectDb } from "@/lib/db";
 import { Member } from "@/lib/models/Member";
 import { Payment } from "@/lib/models/Payment";
+import { MailMessage } from "@/lib/models/MailMessage";
 import { computeDues, formatMonthKey } from "@/lib/dues";
 import {
   KIND_LABEL,
@@ -66,6 +67,17 @@ export default async function MemberDetailPage({
     .sort({ receivedOn: -1, createdAt: -1 })
     .lean();
 
+  const correspondence = await MailMessage.find({
+    $or: [
+      { member: id },
+      { fromEmail: member.email.toLowerCase() },
+      { toEmail: member.email.toLowerCase() },
+    ],
+  })
+    .sort({ createdAt: -1 })
+    .limit(8)
+    .lean();
+
   const duesPaidKobo = payments
     .filter((payment) => payment.kind === "dues")
     .reduce((sum, payment) => sum + payment.amountKobo, 0);
@@ -90,6 +102,14 @@ export default async function MemberDetailPage({
         description={`${member.membershipNumber} · ${TIER_LABEL[member.tier]}`}
         action={
           <div className="flex flex-wrap gap-3">
+            {can(session.role, "mail:write") ? (
+              <ButtonLink
+                href={`/admin/mail/compose?memberId=${id}&to=${encodeURIComponent(member.email)}`}
+                variant="ghost"
+              >
+                Send Email
+              </ButtonLink>
+            ) : null}
             {can(session.role, "payments:write") ? (
               <ButtonLink
                 href={`/admin/payments/new?member=${id}`}
@@ -292,6 +312,58 @@ export default async function MemberDetailPage({
           </Table>
         )}
       </section>
+
+      {correspondence.length > 0 ? (
+        <section aria-label="Correspondence" className="mt-12 border-t border-rule pt-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-[1.25rem] text-forest-900">
+              Email Correspondence ({correspondence.length})
+            </h2>
+            {can(session.role, "mail:write") ? (
+              <ButtonLink
+                href={`/admin/mail/compose?memberId=${id}&to=${encodeURIComponent(member.email)}`}
+                variant="ghost"
+              >
+                + Write Email
+              </ButtonLink>
+            ) : null}
+          </div>
+          <div className="space-y-3">
+            {correspondence.map((msg) => (
+              <div
+                key={String(msg._id)}
+                className="flex items-center justify-between border border-rule bg-white p-4 text-[0.875rem]"
+              >
+                <div className="min-w-0 flex-1 pr-4">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-forest-950">
+                      {msg.direction === "inbound"
+                        ? "From Member"
+                        : "From Secretariat"}
+                    </span>
+                    <span className="text-ink-soft">·</span>
+                    <span className="text-ink truncate">{msg.subject}</span>
+                  </div>
+                  <p className="mt-1 text-[0.8125rem] text-ink-soft truncate">
+                    {msg.bodyText.slice(0, 120)}
+                  </p>
+                </div>
+                <div className="shrink-0 flex items-center gap-3">
+                  <span className="text-[0.75rem] text-ink-faint">
+                    {new Date(msg.createdAt).toLocaleDateString("en-NG", dateFormat)}
+                  </span>
+                  <Link
+                    href={`/admin/mail/${String(msg._id)}`}
+                    className="label-sm text-forest-900 underline hover:text-gold-600"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <p className="mt-10">
         <Link

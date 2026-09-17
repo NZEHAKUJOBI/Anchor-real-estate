@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { AdminSidebar, type NavItem } from "@/components/admin/AdminSidebar";
 import { requireSession } from "@/lib/auth";
 import { can } from "@/lib/rbac";
+import { connectDb } from "@/lib/db";
+import { MailMessage } from "@/lib/models/MailMessage";
 import { signOut } from "../login/actions";
 
 export const metadata: Metadata = {
@@ -19,6 +21,15 @@ export default async function AdminLayout({
 }) {
   const session = await requireSession();
 
+  let unreadMailCount = 0;
+  if (can(session.role, "mail:read")) {
+    await connectDb();
+    unreadMailCount = await MailMessage.countDocuments({
+      direction: "inbound",
+      isRead: false,
+    });
+  }
+
   const items: NavItem[] = [
     { href: "/admin", label: "Overview" },
     ...(can(session.role, "members:read")
@@ -29,6 +40,15 @@ export default async function AdminLayout({
       : []),
     ...(can(session.role, "enquiries:read")
       ? [{ href: "/admin/applications", label: "Enquiries" }]
+      : []),
+    ...(can(session.role, "mail:read")
+      ? [
+          {
+            href: "/admin/mail",
+            label: "Mail",
+            badge: unreadMailCount > 0 ? unreadMailCount : undefined,
+          },
+        ]
       : []),
     ...(can(session.role, "users:manage")
       ? [{ href: "/admin/users", label: "Admin Users" }]

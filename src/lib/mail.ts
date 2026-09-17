@@ -1,5 +1,9 @@
+import { Types } from "mongoose";
 import nodemailer, { type Transporter } from "nodemailer";
 import type { EnquiryDoc } from "./models/Enquiry";
+import { MailMessage } from "./models/MailMessage";
+import { recordAudit } from "./models/AuditLog";
+import { connectDb } from "./db";
 import { SLOT_PRICE_KOBO } from "./constants";
 import { formatNaira, formatNumber } from "./money";
 
@@ -180,7 +184,7 @@ const BRAND = {
 };
 
 /** Email clients strip <style>, so everything here is inlined. */
-function shell(heading: string, body: string): string {
+export function shell(heading: string, body: string): string {
   return `<!doctype html>
 <html lang="en"><body style="margin:0;padding:0;background:${BRAND.paper};">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.paper};padding:32px 16px;">
@@ -399,3 +403,154 @@ export async function sendEnquiryMail(enquiry: EnquiryDoc): Promise<SendOutcome>
 function reasonOf(reason: unknown): string {
   return reason instanceof Error ? reason.message : String(reason);
 }
+
+export type SendCustomMailParams = {
+  to: string | string[];
+  subject: string;
+  bodyText: string;
+  bodyHtml?: string;
+  replyTo?: string;
+  from?: string;
+  memberId?: string;
+  enquiryId?: string;
+  adminUser?: {
+    id: string;
+    name: string;
+    email: string;
+    role?: string;
+  };
+  inReplyTo?: string;
+};
+
+export type CustomMailResult = {
+  success: boolean;
+  messageDocId?: string;
+  error?: string;
+  simulated?: boolean;
+};
+
+export async function sendCustomMail(
+  params: SendCustomMailParams,
+): Promise<CustomMailResult> {
+  await connectDb();
+
+  const recipients = Array.isArray(params.to)
+    ? params.to.map((t) => t.trim()).filter(Boolean)
+    : [params.to.trim()];
+
+  if (recipients.length === 0) {
+    return { success: false, error: "Recipient email is required" };
+  }
+
+  const rawFrom =
+    params.from ||
+    process.env.MAIL_FROM ||
+    "Anchor Real Estate Group <onboarding@resend.dev>";
+  const fromFormatted = cleanFromAddress(rawFrom);
+  const fromClean = cleanEmailAddress(fromFormatted) || "secretariat@anchorrealestategroup.ng";
+
+  const toCleanList = recipients
+    .map((r) => cleanEmailAddress(r) || r)
+    .filter(Boolean);
+
+  const replyTo = cleanReplyTo(
+    params.replyTo ||
+      secretariatAddress() ||
+      params.adminUser?.email ||
+      fromClean,
+  );
+
+  const html =
+    params.bodyHtml ||
+    shell(
+      escapeHtml(params.subject),
+      params.bodyText
+        .split(/\n\n+/)
+        .map(
+          (para) =>
+            `<p style="margin:0 0 16px;white-space:pre-wrap;">${escapeHtml(para.trim())}</p>`,
+        )
+        .join(""),
+    );
+
+  const configured = isMailConfigured();
+  let status: "sent" | "failed" | "simulated" = configured ? "sent" : "simulated";
+  let errorMessage: string | undefined;
+
+  if (configured) {
+    try {
+      // Send sequentially or per recipient to guarantee clean headers
+      for (const recipient of recipients) {
+        await sendMailMessage({
+          from: fromFormatted,
+          to: recipient,
+          replyTo,
+          subject: params.subject,
+          text: params.bodyText,
+          html,
+        });
+      }
+    } catch (err) {
+      status = "failed";
+      errorMessage = reasonOf(err);
+      console.error("[mail] sendCustomMail failed:", errorMessage);
+    }
+  } else {
+    console.warn(
+      "[mail] SMTP/Resend not configured — recording email as simulated",
+    );
+  }
+
+  try {
+    const doc = await MailMessage.create({
+      direction: "outbound",
+      from: fromFormatted,
+      fromEmail: fromClean,
+      to: recipients,
+      toEmail: toCleanList,
+      replyTo,
+      subject: params.subject,
+      bodyText: params.bodyText,
+      bodyHtml: html,
+      status,
+      errorMessage,
+      isRead: true,
+      member: params.memberId ? new Types.ObjectId(params.memberId) : undefined,
+      enquiry: params.enquiryId ? new Types.ObjectId(params.enquiryId) : undefined,
+      inReplyTo: params.inReplyTo ? new Types.ObjectId(params.inReplyTo) : undefined,
+      sentBy: params.adminUser
+        ? {
+            id: new Types.ObjectId(params.adminUser.id),
+            name: params.adminUser.name,
+            email: params.adminUser.email,
+          }
+        : undefined,
+    });
+
+    if (params.adminUser) {
+      await recordAudit({
+        actor: new Types.ObjectId(params.adminUser.id),
+        actorName: params.adminUser.name,
+        actorRole: params.adminUser.role || "admin",
+        action: "send_mail",
+        entity: params.memberId ? "member" : "admin_user",
+        entityId: String(doc._id),
+        summary: `Sent email "${params.subject}" to ${recipients.join(", ")} (${status})`,
+      });
+    }
+
+    return {
+      success: status !== "failed",
+      messageDocId: String(doc._id),
+      error: errorMessage,
+      simulated: status === "simulated",
+    };
+  } catch (dbErr) {
+    console.error("[mail] failed to save MailMessage doc:", dbErr);
+    return {
+      success: false,
+      error: `Mail dispatch finished with ${status}, but recording failed: ${reasonOf(dbErr)}`,
+    };
+  }
+}
+

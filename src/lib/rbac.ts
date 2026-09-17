@@ -22,6 +22,8 @@ export const PERMISSIONS = [
   "payments:write",
   "enquiries:read",
   "enquiries:write",
+  "mail:read",
+  "mail:write",
   "users:manage",
   "audit:read",
 ] as const;
@@ -38,6 +40,8 @@ const MATRIX: Record<Role, readonly Permission[]> = {
     "payments:write",
     "enquiries:read",
     "enquiries:write",
+    "mail:read",
+    "mail:write",
     "users:manage",
     "audit:read",
   ],
@@ -49,6 +53,8 @@ const MATRIX: Record<Role, readonly Permission[]> = {
     "payments:write",
     "enquiries:read",
     "enquiries:write",
+    "mail:read",
+    "mail:write",
     "audit:read",
   ],
   // Books the receipts, but does not alter the register.
@@ -57,6 +63,7 @@ const MATRIX: Record<Role, readonly Permission[]> = {
     "payments:read",
     "payments:write",
     "enquiries:read",
+    "mail:read",
   ],
   // Maintains the register and handles applications; cannot touch money.
   secretary: [
@@ -65,8 +72,10 @@ const MATRIX: Record<Role, readonly Permission[]> = {
     "payments:read",
     "enquiries:read",
     "enquiries:write",
+    "mail:read",
+    "mail:write",
   ],
-  viewer: ["members:read", "payments:read", "enquiries:read"],
+  viewer: ["members:read", "payments:read", "enquiries:read", "mail:read"],
 };
 
 export const ROLE_LABEL: Record<Role, string> = {
