@@ -3,7 +3,7 @@ import { connectDb } from "@/lib/db";
 import { MailMessage } from "@/lib/models/MailMessage";
 import { Member } from "@/lib/models/Member";
 import { Enquiry } from "@/lib/models/Enquiry";
-import { cleanEmailAddress } from "@/lib/mail";
+import { cleanEmailAddress, resendApiKey } from "@/lib/mail";
 
 /**
  * Inbound Email Webhook
@@ -53,6 +53,37 @@ export async function POST(request: NextRequest) {
       bodyText = String(data.text || data.bodyText || data.body || "");
       bodyHtml = data.html || data.bodyHtml;
       replyTo = data.reply_to || data.replyTo;
+
+      // Resend email.received webhook passes email_id; fetch full text/html if needed
+      const emailId = data.email_id || data.id;
+      if (emailId && (!bodyText || !bodyHtml)) {
+        const apiKey = resendApiKey();
+        if (apiKey) {
+          try {
+            let res = await fetch(
+              `https://api.resend.com/emails/receiving/${emailId}`,
+              { headers: { Authorization: `Bearer ${apiKey}` } },
+            );
+            if (!res.ok) {
+              res = await fetch(`https://api.resend.com/emails/${emailId}`, {
+                headers: { Authorization: `Bearer ${apiKey}` },
+              });
+            }
+            if (res.ok) {
+              const full = await res.json();
+              if (full.text) bodyText = full.text;
+              if (full.html) bodyHtml = full.html;
+              if (!from && full.from) from = full.from;
+              if (!subject && full.subject) subject = full.subject;
+            }
+          } catch (apiErr) {
+            console.warn(
+              "[inbound-mail] could not fetch body via Resend API:",
+              apiErr,
+            );
+          }
+        }
+      }
     } else if (
       contentType.includes("multipart/form-data") ||
       contentType.includes("application/x-www-form-urlencoded")
