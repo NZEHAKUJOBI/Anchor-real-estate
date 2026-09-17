@@ -112,17 +112,17 @@ export default async function MailboxPage({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-8">
         <StatTile
           label="Unread Inbound"
-          value={unreadCount}
+          value={String(unreadCount)}
           detail="Pending admin review"
         />
         <StatTile
           label="Total Received"
-          value={totalInbound}
+          value={String(totalInbound)}
           detail="Website enquiries & incoming emails"
         />
         <StatTile
           label="Total Sent"
-          value={totalSent}
+          value={String(totalSent)}
           detail="Official communications dispatched"
         />
       </div>
@@ -186,7 +186,7 @@ export default async function MailboxPage({
       {messages.length === 0 ? (
         <EmptyState
           title={`No ${tab === "inbox" ? "inbound" : tab === "sent" ? "sent" : ""} messages found`}
-          description={
+          body={
             tab === "inbox"
               ? "When visitors submit enquiries or send emails to the secretariat, they will appear here."
               : "No emails have been sent from the admin panel yet."
@@ -203,12 +203,12 @@ export default async function MailboxPage({
         <Table>
           <thead>
             <tr>
-              <Th className="w-10"></Th>
+              <Th>{""}</Th>
               <Th>{tab === "sent" ? "Recipient" : "Sender"}</Th>
               <Th>Subject</Th>
               <Th>Association</Th>
               <Th>Status</Th>
-              <Th className="text-right">Date</Th>
+              <Th align="right">Date</Th>
             </tr>
           </thead>
           <tbody>

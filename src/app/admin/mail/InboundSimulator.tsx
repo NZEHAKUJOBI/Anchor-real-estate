@@ -55,7 +55,7 @@ export function InboundSimulator() {
 
       {state.success ? (
         <div className="mb-4">
-          <Notice tone="ok">
+          <Notice tone="success">
             Simulated inbound message created successfully! Check your Inbox.
           </Notice>
         </div>
@@ -100,7 +100,9 @@ export function InboundSimulator() {
           >
             Cancel
           </Button>
-          <SubmitButton label="Simulate Incoming Email" pendingLabel="Creating..." />
+          <SubmitButton pendingLabel="Creating...">
+            Simulate Incoming Email
+          </SubmitButton>
         </div>
       </form>
     </div>

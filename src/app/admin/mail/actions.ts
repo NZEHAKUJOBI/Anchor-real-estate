@@ -106,7 +106,7 @@ export async function sendMailAction(
       enquiryId: enquiryId && isValidObjectId(enquiryId) ? enquiryId : undefined,
       inReplyTo: inReplyTo && isValidObjectId(inReplyTo) ? inReplyTo : undefined,
       adminUser: {
-        id: session.id,
+        id: session.sub,
         name: session.name,
         email: session.email,
         role: session.role,

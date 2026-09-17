@@ -98,7 +98,7 @@ export function ComposeForm({
 
       {state.success ? (
         <div className="mb-6">
-          <Notice tone="ok">
+          <Notice tone="success">
             {state.simulated
               ? "Email successfully recorded (Simulated mode)."
               : "Email dispatched successfully!"}
@@ -260,7 +260,9 @@ export function ComposeForm({
 
         {/* Actions */}
         <div className="flex items-center gap-4 pt-4 border-t border-rule">
-          <SubmitButton label="Send Official Email" pendingLabel="Dispatching..." />
+          <SubmitButton pendingLabel="Dispatching...">
+            Send Official Email
+          </SubmitButton>
           <Link
             href="/admin/mail"
             className="label-sm text-ink-soft hover:text-ink underline"
