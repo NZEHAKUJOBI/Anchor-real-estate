@@ -113,8 +113,15 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-3">
           <Link
+            href="/dashboard"
+            className="label-sm hidden text-gold-300 hover:text-gold-200 border border-gold-400/30 px-3 py-2 transition-colors sm:inline-block"
+          >
+            My Anchor
+          </Link>
+
+          <Link
             href="/join"
-            className="label-sm hidden border border-gold-500/60 px-4 py-2.5 text-gold-300 transition-colors duration-200 hover:border-gold-400 hover:bg-gold-400 hover:text-forest-950 sm:inline-block"
+            className="label-sm hidden bg-gold-400 px-4 py-2.5 text-forest-950 font-semibold transition-colors duration-200 hover:bg-gold-300 sm:inline-block"
           >
             Become a Member
           </Link>
@@ -158,13 +165,20 @@ export function SiteHeader() {
                 </a>
               </li>
             ))}
-            <li className="pt-4">
+            <li className="pt-4 grid grid-cols-2 gap-2">
+              <Link
+                href="/dashboard"
+                onClick={() => setOpen(false)}
+                className="label-sm block border border-gold-400/40 text-gold-300 px-4 py-3 text-center"
+              >
+                My Anchor
+              </Link>
               <Link
                 href="/join"
                 onClick={() => setOpen(false)}
-                className="label-sm block bg-gold-400 px-4 py-3 text-center text-forest-950"
+                className="label-sm block bg-gold-400 px-4 py-3 text-center text-forest-950 font-bold"
               >
-                Become a Member
+                Join Society
               </Link>
             </li>
           </ul>

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { isValidObjectId, Types } from "mongoose";
+import { isValidObjectId } from "mongoose";
 import { requirePermission } from "@/lib/auth";
 import { connectDb } from "@/lib/db";
 import { MailMessage } from "@/lib/models/MailMessage";

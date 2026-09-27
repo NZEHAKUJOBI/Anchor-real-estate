@@ -19,13 +19,15 @@ export const society = {
 } as const;
 
 export const navigation = [
-  { id: "at-a-glance", label: "At a Glance" },
-  { id: "vision", label: "Vision" },
+  { id: "homepath", label: "HomePath™" },
+  { id: "pathways", label: "Pathways" },
+  { id: "anchorscore", label: "AnchorScore™" },
+  { id: "property-dna", label: "Property DNA™" },
+  { id: "pool-visualizer", label: "Slot Pool" },
+  { id: "circles", label: "Circles" },
+  { id: "marketplace", label: "Bidding" },
+  { id: "bulkbuy", label: "BulkBuy™" },
   { id: "governance", label: "Governance" },
-  { id: "membership", label: "Membership" },
-  { id: "services", label: "Services" },
-  { id: "outlook", label: "Outlook" },
-  { id: "join", label: "How to Join" },
 ] as const;
 
 /* ── 01 · At a Glance ─────────────────────────────────────────────── */

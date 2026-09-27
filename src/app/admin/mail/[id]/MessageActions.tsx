@@ -1,7 +1,6 @@
 "use client";
 
 import { useTransition } from "react";
-import Link from "next/link";
 import { ButtonLink, Button } from "@/components/admin/ui";
 import { toggleReadAction, deleteMailAction } from "../actions";
 

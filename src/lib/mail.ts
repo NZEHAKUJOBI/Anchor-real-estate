@@ -70,7 +70,7 @@ export function cleanFromAddress(raw: string | undefined): string {
   if (!raw) return FALLBACK;
 
   // Strip ALL quote characters everywhere, then trim
-  let s = raw.replace(/["""''`]/g, "").trim();
+  const s = raw.replace(/["""''`]/g, "").trim();
 
   // Extract email from angle brackets: Name <email@domain>
   const angleMatch = s.match(/^(.*?)\s*<\s*([^<>\s]+@[^<>\s]+)\s*>$/);
@@ -91,7 +91,7 @@ export function cleanFromAddress(raw: string | undefined): string {
 
 export function cleanEmailAddress(addr: string | undefined): string | undefined {
   if (!addr) return undefined;
-  let s = addr.replace(/["""''`]/g, "").trim();
+  const s = addr.replace(/["""''`]/g, "").trim();
   const match = s.match(/<\s*([^<>\s]+@[^<>\s]+)\s*>/);
   if (match) return match[1].trim();
   if (/^[^\s<>]+@[^\s<>]+$/.test(s)) return s;
