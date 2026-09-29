@@ -4,22 +4,23 @@ import logo from "@/app/logo.png";
 /**
  * Society crest — the cooperative's seal, a gold anchor and portico on a forest
  * field. The artwork is masked to its circle with transparent corners, so it
- * sits directly on the forest ground with no plate behind it.
+ * sits directly on either ground with no plate behind it.
  *
- * `className` handles layout as before; `size` is the intrinsic width Next.js
- * optimises for, so set it to the largest CSS size the call site renders.
+ * `className` handles layout; `size` is the intrinsic width Next.js optimises
+ * for, so set it to the largest CSS size the call site renders. `eager` loads
+ * it with the page for instances above the fold (Next 16 retired `priority`).
  * The seal is decorative wherever the society name sits beside it, which is
  * every current call site — pass `alt` only if that stops being true.
  */
 export function Crest({
   className,
   size = 64,
-  priority = false,
+  eager = false,
   alt = "",
 }: {
   className?: string;
   size?: number;
-  priority?: boolean;
+  eager?: boolean;
   alt?: string;
 }) {
   return (
@@ -28,7 +29,7 @@ export function Crest({
       alt={alt}
       width={size}
       height={size}
-      priority={priority}
+      loading={eager ? "eager" : undefined}
       className={className}
     />
   );

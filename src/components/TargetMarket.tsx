@@ -1,40 +1,31 @@
 import { Fragment } from "react";
 import { Reveal } from "./Reveal";
-import { SectionHeading } from "./SectionHeading";
+import { Accent, SectionHeading } from "./SectionHeading";
+import { cn } from "./ui/cn";
+import { Icon } from "./ui/Icons";
 import { expansionNote, marketLanes } from "@/lib/content";
 
 /** Turns down the page on narrow screens, along the lane on wide ones. */
 function Arrow() {
   return (
-    <span
-      aria-hidden="true"
-      className="flex shrink-0 items-center justify-center self-center py-2 sm:py-0"
-    >
-      <svg
-        viewBox="0 0 40 12"
-        className="h-3 w-8 rotate-90 text-gold-400/70 sm:rotate-0"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M0 6 H34" />
-        <path d="M29 2 L34 6 L29 10" />
-      </svg>
+    <span aria-hidden="true" className="flex shrink-0 items-center justify-center self-center py-1.5 sm:py-0">
+      <Icon name="arrow-right" className="size-5 rotate-90 text-gold-400/70 sm:rotate-0" />
     </span>
   );
 }
 
-function Node({ children, terminal }: { children: string; terminal?: boolean }) {
+function Node({ children, terminal, first }: { children: string; terminal?: boolean; first?: boolean }) {
   return (
     <span
-      className={`flex items-center px-5 py-4 text-center text-[0.9375rem] leading-snug text-balance sm:flex-1 sm:text-left ${
+      className={cn(
+        "flex items-center gap-3 rounded-2xl px-5 py-4 text-[0.9375rem] leading-snug sm:flex-1",
         terminal
-          ? "border border-gold-400/45 bg-gold-400/10 text-gold-300"
-          : "border border-paper/20 bg-paper/[0.04] text-paper/85"
-      }`}
+          ? "border border-gold-400/40 bg-gold-400/10 font-medium text-gold-200"
+          : "border border-white/12 bg-white/[0.04] text-paper/85",
+      )}
     >
+      {first ? <Icon name="users" className="size-5 shrink-0 text-gold-400" /> : null}
+      {terminal ? <Icon name="target" className="size-5 shrink-0 text-gold-300" /> : null}
       {children}
     </span>
   );
@@ -42,34 +33,46 @@ function Node({ children, terminal }: { children: string; terminal?: boolean }) 
 
 export function TargetMarket() {
   return (
-    <section id="outlook" className="bg-forest-900 py-24 text-paper md:py-32">
-      <div className="shell">
+    <section id="outlook" className="relative overflow-hidden bg-forest-950 py-20 text-paper md:py-28">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_70%_at_100%_100%,rgb(43_115_88/0.4),transparent_70%)]"
+      />
+      <div className="shell relative">
         <Reveal>
           <SectionHeading
-            index="06"
             tone="dark"
-            title="Target Market & Expansion"
+            layout="split"
+            eyebrow="Target market & expansion"
+            title={
+              <>
+                Two routes, <Accent tone="dark">in sequence.</Accent>
+              </>
+            }
             lead="Two routes to membership, sequenced rather than pursued at once. The first is the founding cohort; the second widens access once the schemes and the credit machinery behind them are proven."
           />
         </Reveal>
 
         <Reveal delay={80}>
-          <div className="grid gap-px border-t border-paper/15 bg-paper/15">
-            {marketLanes.map((lane) => (
+          <div className="space-y-4">
+            {marketLanes.map((lane, laneIndex) => (
               <div
                 key={lane.tier}
-                className="bg-forest-900 py-9 lg:grid lg:grid-cols-12 lg:items-center lg:gap-8"
+                className="rounded-3xl border border-white/10 bg-white/[0.025] p-5 sm:p-6 lg:grid lg:grid-cols-12 lg:items-center lg:gap-8"
               >
-                <p className="label text-gold-400 lg:col-span-2">{lane.tier}</p>
+                <div className="flex items-center gap-3 lg:col-span-2">
+                  <span className="figure-num flex size-10 items-center justify-center rounded-full bg-gold-400 text-[1.125rem] text-forest-950">
+                    {laneIndex + 1}
+                  </span>
+                  <p className="eyebrow text-gold-400">{lane.tier}</p>
+                </div>
 
-                <div className="mt-6 flex flex-col sm:flex-row sm:items-stretch sm:gap-4 lg:col-span-10 lg:mt-0">
-                  <Node>{lane.segment}</Node>
+                <div className="mt-5 flex flex-col sm:flex-row sm:items-stretch sm:gap-3 lg:col-span-10 lg:mt-0">
+                  <Node first>{lane.segment}</Node>
                   {lane.steps.map((step, index) => (
                     <Fragment key={step}>
                       <Arrow />
-                      <Node terminal={index === lane.steps.length - 1}>
-                        {step}
-                      </Node>
+                      <Node terminal={index === lane.steps.length - 1}>{step}</Node>
                     </Fragment>
                   ))}
                 </div>
@@ -79,7 +82,10 @@ export function TargetMarket() {
         </Reveal>
 
         <Reveal delay={140}>
-          <p className="label-sm mt-8 text-paper/55">{expansionNote}</p>
+          <p className="mt-6 flex items-center gap-2 text-[0.875rem] text-paper/55">
+            <Icon name="info" className="size-4 text-gold-400" />
+            {expansionNote}
+          </p>
         </Reveal>
       </div>
     </section>

@@ -18,17 +18,114 @@ export const society = {
   bylaws: "FCTA By-Laws No. R11913",
 } as const;
 
-export const navigation = [
-  { id: "homepath", label: "HomePath™" },
-  { id: "pathways", label: "Pathways" },
-  { id: "anchorscore", label: "AnchorScore™" },
-  { id: "property-dna", label: "Property DNA™" },
-  { id: "pool-visualizer", label: "Slot Pool" },
-  { id: "circles", label: "Circles" },
-  { id: "marketplace", label: "Bidding" },
-  { id: "bulkbuy", label: "BulkBuy™" },
-  { id: "governance", label: "Governance" },
-] as const;
+/* ── Site navigation ──────────────────────────────────────────────── */
+
+/**
+ * Every entry is a section id on the landing page. The header prefixes them
+ * with "/" on other routes, so the same list works site-wide.
+ */
+export type NavLink = { id: string; label: string; description?: string };
+
+export type NavMenu = {
+  key: string;
+  label: string;
+  title: string;
+  summary: string;
+  items: NavLink[];
+};
+
+export type NavItem = ({ type: "link" } & NavLink) | ({ type: "menu" } & NavMenu);
+
+export const siteNav: NavItem[] = [
+  { type: "link", id: "homepath", label: "HomePath" },
+  { type: "link", id: "pathways", label: "Pathways" },
+  {
+    type: "menu",
+    key: "platform",
+    label: "Platform",
+    title: "The Anchor platform",
+    summary:
+      "The tools that turn a monthly contribution into verified, documented ownership.",
+    items: [
+      {
+        id: "anchorscore",
+        label: "AnchorScore™",
+        description: "Credit profiles for earners without payslips",
+      },
+      {
+        id: "property-dna",
+        label: "Property DNA™",
+        description: "Verified title, build progress and costs",
+      },
+      {
+        id: "pool-visualizer",
+        label: "Slot Pool",
+        description: "All 1,000,000 ownership slots, in the open",
+      },
+      {
+        id: "circles",
+        label: "Ownership Circles™",
+        description: "Buy together with family or colleagues",
+      },
+      {
+        id: "marketplace",
+        label: "Reverse Bidding",
+        description: "Developers compete to build for members",
+      },
+      {
+        id: "bulkbuy",
+        label: "BulkBuy™",
+        description: "Member pricing on materials and fittings",
+      },
+      {
+        id: "exchange",
+        label: "Property Exchange™",
+        description: "Transfer slots within the membership",
+      },
+    ],
+  },
+  {
+    type: "menu",
+    key: "about",
+    label: "About",
+    title: "The Society",
+    summary:
+      "A member-owned multipurpose cooperative, registered and governed in the FCT.",
+    items: [
+      {
+        id: "at-a-glance",
+        label: "At a glance",
+        description: "The Society's key figures",
+      },
+      {
+        id: "vision",
+        label: "Vision & values",
+        description: "What the Society stands for",
+      },
+      {
+        id: "governance",
+        label: "Governance",
+        description: "Executive committee and trustees",
+      },
+      {
+        id: "membership",
+        label: "Membership & fees",
+        description: "Slots, holding limits and dues",
+      },
+      {
+        id: "services",
+        label: "Products & services",
+        description: "Eight lines of cooperative activity",
+      },
+      {
+        id: "outlook",
+        label: "Target market",
+        description: "Who we serve and how we expand",
+      },
+    ],
+  },
+  { type: "link", id: "join", label: "How to join" },
+];
 
 /* ── 01 · At a Glance ─────────────────────────────────────────────── */
 

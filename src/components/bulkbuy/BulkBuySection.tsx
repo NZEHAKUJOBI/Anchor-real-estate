@@ -1,14 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { Accent, SectionHeading } from "../SectionHeading";
+import { buttonClass } from "../ui/Button";
+import { cn, naira } from "../ui/cn";
+import { Icon, type IconName } from "../ui/Icons";
+import { IconTile, Pill, card } from "../ui/primitives";
 
 interface BulkItem {
   id: string;
   category: string;
   name: string;
-  retailPrice: string;
-  memberPrice: string;
-  savings: string;
+  retailPrice: number;
+  memberPrice: number;
   partner: string;
   popular?: boolean;
 }
@@ -18,9 +23,8 @@ const bulkCatalog: BulkItem[] = [
     id: "solar-5kva",
     category: "Clean Power",
     name: "5kVA Smart Lithium Hybrid Solar System (5.1kWh Storage)",
-    retailPrice: "₦4,850,000",
-    memberPrice: "₦3,580,000",
-    savings: "₦1,270,000 Saved (26%)",
+    retailPrice: 4850000,
+    memberPrice: 3580000,
     partner: "Anchor Clean Energy Consortium",
     popular: true,
   },
@@ -28,36 +32,32 @@ const bulkCatalog: BulkItem[] = [
     id: "cement-500",
     category: "Building Materials",
     name: "Portland Cement Grade 42.5R (Bulk 500-Bag Depot Order)",
-    retailPrice: "₦4,250,000",
-    memberPrice: "₦3,400,000",
-    savings: "₦850,000 Saved (20%)",
+    retailPrice: 4250000,
+    memberPrice: 3400000,
     partner: "Direct Manufacturer Allocation",
   },
   {
     id: "porcelain-tiles",
     category: "Finishing",
     name: "Full-Body Vitrified Porcelain Floor Tiles (Whole-House 300sqm)",
-    retailPrice: "₦3,100,000",
-    memberPrice: "₦2,350,000",
-    savings: "₦750,000 Saved (24%)",
+    retailPrice: 3100000,
+    memberPrice: 2350000,
     partner: "Prime Ceramic Importers",
   },
   {
     id: "security-doors",
     category: "Fittings",
     name: "Heavy-Gauge Armoured Turkish Security Doors (Front & Rear Pack)",
-    retailPrice: "₦1,600,000",
-    memberPrice: "₦1,180,000",
-    savings: "₦420,000 Saved (26%)",
+    retailPrice: 1600000,
+    memberPrice: 1180000,
     partner: "SteelCore Systems Ltd",
   },
   {
     id: "smart-appliances",
     category: "Living",
     name: "Complete Inverter AC & Kitchen Appliance Bundle (4 Inverter ACs + Oven)",
-    retailPrice: "₦3,800,000",
-    memberPrice: "₦2,950,000",
-    savings: "₦850,000 Saved (22%)",
+    retailPrice: 3800000,
+    memberPrice: 2950000,
     partner: "Haier / LG Corporate Channel",
     popular: true,
   },
@@ -65,103 +65,126 @@ const bulkCatalog: BulkItem[] = [
     id: "fiber-insurance",
     category: "Services",
     name: "Annual Comprehensive Home Insurance + 1Gbps Fiber Internet (12 Months)",
-    retailPrice: "₦720,000",
-    memberPrice: "₦490,000",
-    savings: "₦230,000 Saved (32%)",
+    retailPrice: 720000,
+    memberPrice: 490000,
     partner: "Leadway Assurance & FibreOne",
   },
 ];
 
+const categoryIcon: Record<string, IconName> = {
+  "Clean Power": "zap",
+  "Building Materials": "package",
+  Finishing: "grid",
+  Fittings: "lock",
+  Living: "home",
+  Services: "shield",
+};
+
+const categories = ["All", "Clean Power", "Building Materials", "Finishing", "Fittings", "Living", "Services"];
+
 export function BulkBuySection() {
   const [activeCategory, setActiveCategory] = useState<string>("All");
 
-  const categories = ["All", "Clean Power", "Building Materials", "Finishing", "Fittings", "Living", "Services"];
-
-  const filteredItems = activeCategory === "All"
-    ? bulkCatalog
-    : bulkCatalog.filter((item) => item.category === activeCategory);
+  const filteredItems =
+    activeCategory === "All"
+      ? bulkCatalog
+      : bulkCatalog.filter((item) => item.category === activeCategory);
 
   return (
-    <section id="bulkbuy" className="py-24 bg-forest-900 text-paper border-b border-gold-500/30">
+    <section id="bulkbuy" className="bg-paper py-20 md:py-28">
       <div className="shell">
-        <div className="max-w-3xl mb-12">
-          <p className="label text-gold-400">Pillar 12 · Post-Purchase Economic Power</p>
-          <h2 className="font-display mt-3 text-3xl sm:text-4xl lg:text-5xl text-paper">
-            Anchor BulkBuy™
-          </h2>
-          <p className="mt-4 text-paper/75 text-lg">
-            Membership remains valuable long after acquiring your keys. We negotiate collective institutional pricing on cement, solar systems, sanitary ware, appliances, and maintenance.
-          </p>
+        <SectionHeading
+          layout="split"
+          eyebrow="Anchor BulkBuy™ · Member pricing"
+          title={
+            <>
+              Membership that pays <Accent>after the keys.</Accent>
+            </>
+          }
+          lead="Membership remains valuable long after acquiring your keys. We negotiate collective institutional pricing on cement, solar systems, sanitary ware, appliances, and maintenance."
+        />
+
+        <div role="group" aria-label="Filter by category" className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 no-scrollbar sm:mx-0 sm:flex-wrap sm:px-0">
+          {categories.map((cat) => {
+            const on = activeCategory === cat;
+            return (
+              <button
+                key={cat}
+                type="button"
+                aria-pressed={on}
+                onClick={() => setActiveCategory(cat)}
+                className={cn(
+                  "shrink-0 rounded-full border px-4 py-2 text-[0.875rem] font-semibold transition-colors",
+                  on
+                    ? "border-forest-900 bg-forest-900 text-paper"
+                    : "border-forest-900/15 bg-ivory text-ink-soft hover:border-forest-900/35 hover:text-forest-900",
+                )}
+              >
+                {cat}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Category Filters */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setActiveCategory(cat)}
-              className={`label-sm px-4 py-2 rounded-xs border transition-colors ${
-                activeCategory === cat
-                  ? "border-gold-400 bg-gold-400 text-forest-950 font-bold"
-                  : "border-paper/20 text-paper/75 hover:border-gold-400/50"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Catalog Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map((item) => (
-            <div
-              key={item.id}
-              className="bg-forest-950 border border-gold-400/25 p-6 rounded-sm flex flex-col justify-between hover:border-gold-400/60 transition-all duration-300 relative"
-            >
-              {item.popular && (
-                <div className="absolute top-4 right-4 bg-gold-400 text-forest-950 text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-xs">
-                  High Demand
-                </div>
-              )}
-
-              <div>
-                <span className="text-[10px] label text-paper/50 block mb-1">{item.category}</span>
-                <h3 className="font-display text-lg text-paper leading-snug mb-2 pr-12">{item.name}</h3>
-                <span className="text-xs text-gold-400/80 block mb-4">Partner: {item.partner}</span>
-
-                <div className="bg-forest-900/80 p-3.5 rounded-sm border border-paper/10 space-y-1 mb-4">
-                  <div className="flex justify-between text-xs text-paper/50">
-                    <span>Retail Market Price:</span>
-                    <span className="line-through">{item.retailPrice}</span>
+        <ul className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {filteredItems.map((item) => {
+            const saving = item.retailPrice - item.memberPrice;
+            const pct = Math.round((saving / item.retailPrice) * 100);
+            return (
+              <li key={item.id} className={cn(card, "animate-fade-in flex flex-col rounded-3xl p-6 transition-shadow duration-300 hover:shadow-lift")}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <IconTile name={categoryIcon[item.category] ?? "package"} size="sm" />
+                    <span className="text-[0.75rem] font-semibold tracking-[0.08em] text-ink-faint uppercase">
+                      {item.category}
+                    </span>
                   </div>
-                  <div className="flex justify-between items-baseline pt-1">
-                    <span className="label-sm text-gold-300">Member Price:</span>
-                    <span className="font-mono text-xl font-bold text-emerald-400">{item.memberPrice}</span>
+                  {item.popular ? (
+                    <Pill tone="solid" icon="star">
+                      High demand
+                    </Pill>
+                  ) : null}
+                </div>
+
+                <h3 className="mt-5 text-[1.0625rem] leading-snug font-semibold text-forest-900">{item.name}</h3>
+                <p className="mt-1.5 mb-6 text-[0.8125rem] text-ink-faint">Partner: {item.partner}</p>
+
+                <div className="mt-auto rounded-2xl bg-paper/80 p-4 ring-1 ring-forest-900/[0.06]">
+                  <div className="flex items-baseline justify-between text-[0.8125rem] text-ink-faint">
+                    <span>Retail market price</span>
+                    <span className="line-through tnum">{naira(item.retailPrice)}</span>
                   </div>
+                  <div className="mt-2 flex items-end justify-between gap-3">
+                    <div>
+                      <p className="text-[0.8125rem] font-medium text-forest-700">Member price</p>
+                      <p className="figure-num text-[1.75rem] leading-none text-forest-900">{naira(item.memberPrice)}</p>
+                    </div>
+                    <Pill tone="mint">Save {pct}%</Pill>
+                  </div>
+                  <p className="mt-3 flex items-center gap-1.5 text-[0.8125rem] font-medium text-mint-700">
+                    <Icon name="check-circle" className="size-4" />
+                    {naira(saving)} saved
+                  </p>
                 </div>
 
-                <div className="text-xs text-emerald-400 font-medium flex items-center gap-1.5 mb-4">
-                  <span>✓</span>
-                  <span>{item.savings}</span>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-paper/10">
-                <button
-                  type="button"
-                  className="w-full label-sm bg-forest-900 border border-gold-400/40 text-gold-300 py-2.5 hover:bg-gold-400 hover:text-forest-950 transition-colors"
+                <Link
+                  href={`/join?bulkbuy=${item.id}`}
+                  className={buttonClass("outline", "md", "mt-6 w-full")}
                 >
-                  Request Bulk Allocation
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+                  Request bulk allocation
+                  <Icon name="arrow-right" className="size-4" strokeWidth={2} />
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
 
-        <div className="mt-12 bg-forest-950/60 border border-gold-400/20 p-5 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-paper/70">
-          <span>Items delivered directly to your Anchor plot or residence with guaranteed manufacturer warranty.</span>
-          <span className="font-mono text-gold-400">Anchor Procurement Desk · Abuja FCT</span>
+        <div className="mt-8 flex flex-col gap-3 rounded-2xl border border-forest-900/10 bg-ivory px-5 py-4 text-[0.875rem] text-ink-soft sm:flex-row sm:items-center sm:justify-between">
+          <span className="flex items-center gap-2.5">
+            <Icon name="package" className="size-5 shrink-0 text-forest-600" />
+            Items delivered directly to your Anchor plot or residence with guaranteed manufacturer warranty.
+          </span>
+          <span className="font-semibold text-forest-800">Anchor Procurement Desk · Abuja FCT</span>
         </div>
       </div>
     </section>

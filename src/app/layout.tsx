@@ -1,23 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans, Source_Serif_4 } from "next/font/google";
+import { IBM_Plex_Mono, Inter, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
 /*
-  Source Serif carries the display voice, Plex Sans the running text, and Plex
-  Mono the labels and legal notes — the pairing of an annual report rather than
-  a product page.
+  Source Serif carries the display voice — with its optical-size axis, so large
+  headlines get the finer display cut — Inter the running text and interface,
+  and Plex Mono the ledger references in the admin area.
 */
 const sourceSerif = Source_Serif_4({
   variable: "--font-source-serif",
   subsets: ["latin"],
   style: ["normal", "italic"],
+  axes: ["opsz"],
   display: "swap",
 });
 
-const plexSans = IBM_Plex_Sans({
-  variable: "--font-plex-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -72,7 +72,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en-NG"
-      className={`${sourceSerif.variable} ${plexSans.variable} ${plexMono.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
+      className={`${sourceSerif.variable} ${inter.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         {/* Scroll reveals start transparent; without JS they must not stay so. */}

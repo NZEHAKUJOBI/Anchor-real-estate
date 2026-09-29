@@ -43,15 +43,15 @@ export default function Home() {
   return (
     <>
       <a
-        href="#homepath"
-        className="label sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-60 focus:bg-gold-400 focus:px-5 focus:py-3 focus:text-forest-950"
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-60 focus:rounded-full focus:bg-gold-400 focus:px-5 focus:py-3 focus:text-[0.875rem] focus:font-semibold focus:text-forest-950"
       >
         Skip to content
       </a>
 
       <SiteHeader />
 
-      <main className="flex-1">
+      <main id="main" className="flex-1">
         {/* Pillar 15: Transformed Homepage & Stage Selectors */}
         <Hero />
 

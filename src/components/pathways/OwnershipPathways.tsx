@@ -1,7 +1,10 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
+import { Reveal } from "../Reveal";
+import { Accent, SectionHeading } from "../SectionHeading";
+import { ButtonAnchor, buttonClass } from "../ui/Button";
+import { cn } from "../ui/cn";
+import { Icon, type IconName } from "../ui/Icons";
+import { CheckList } from "../ui/primitives";
 
 interface Pathway {
   id: string;
@@ -12,6 +15,7 @@ interface Pathway {
   timeline: string;
   features: string[];
   ctaText: string;
+  icon: IconName;
   highlight?: boolean;
 }
 
@@ -29,7 +33,8 @@ const pathways: Pathway[] = [
       "Progressive AnchorScore™ building",
       "Priority allocation in upcoming Anchor estates",
     ],
-    ctaText: "Start Saving",
+    ctaText: "Start saving",
+    icon: "coins",
   },
   {
     id: "own",
@@ -44,7 +49,8 @@ const pathways: Pathway[] = [
       "Fixed construction pricing — immune to inflation",
       "Transparent Property DNA™ project monitoring",
     ],
-    ctaText: "Explore Properties",
+    ctaText: "Explore properties",
+    icon: "key",
     highlight: true,
   },
   {
@@ -60,7 +66,8 @@ const pathways: Pathway[] = [
       "AnchorScore™ underwriting (no payslip barrier)",
       "Option to buy out equity ahead of schedule",
     ],
-    ctaText: "Check Rent-to-Own",
+    ctaText: "Check rent-to-own",
+    icon: "home",
   },
   {
     id: "grow",
@@ -75,107 +82,166 @@ const pathways: Pathway[] = [
       "Secondary liquidity via Anchor Property Exchange",
       "Protected by statutory cooperative asset collateral",
     ],
-    ctaText: "Invest in Slots",
+    ctaText: "Invest in slots",
+    icon: "trending",
   },
 ];
 
+const ladder = ["START", "OWN", "LIVE", "GROW"];
+
 export function OwnershipPathways() {
-  const [activePathway, setActivePathway] = useState("start");
-
   return (
-    <section id="pathways" className="py-24 bg-forest-900 text-paper border-b border-gold-500/30">
-      <div className="shell">
-        <div className="max-w-3xl mb-14">
-          <p className="label text-gold-400">Pillar 07 · Consumer Simplification</p>
-          <h2 className="font-display mt-3 text-3xl sm:text-4xl lg:text-5xl text-paper">
-            Four Distinct Ownership Pathways
-          </h2>
-          <p className="mt-4 text-paper/75 text-lg">
-            Where are you in this system? Rather than presenting eight unrelated services, Anchor organizes your journey into clear, structured milestones.
-          </p>
-        </div>
+    <section id="pathways" className="relative overflow-hidden bg-forest-950 py-20 text-paper md:py-28">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_50%_at_50%_0%,rgb(43_115_88/0.35),transparent_70%)]"
+      />
+      <div className="shell relative">
+        <Reveal>
+          <SectionHeading
+            tone="dark"
+            layout="split"
+            eyebrow="Ownership pathways"
+            title={
+              <>
+                Four pathways. <Accent tone="dark">One ladder</Accent> to ownership.
+              </>
+            }
+            lead="Where are you in this system? Rather than presenting eight unrelated services, Anchor organises your journey into clear, structured milestones."
+          />
+        </Reveal>
 
-        {/* Pathway Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {pathways.map((p) => {
-            const isSelected = activePathway === p.id;
+        <div className="grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {pathways.map((p, index) => {
+            const featured = p.highlight;
             return (
-              <div
-                key={p.id}
-                onClick={() => setActivePathway(p.id)}
-                className={`cursor-pointer rounded-sm border p-6 flex flex-col justify-between transition-all duration-300 ${
-                  p.highlight
-                    ? "border-gold-400 bg-forest-950/90 shadow-2xl relative"
-                    : isSelected
-                    ? "border-gold-400/80 bg-forest-950/70"
-                    : "border-paper/15 bg-forest-950/40 hover:border-gold-400/40 hover:bg-forest-950/60"
-                }`}
-              >
-                {p.highlight && (
-                  <div className="absolute -top-3 right-4 bg-gold-400 text-forest-950 text-[10px] font-bold px-2.5 py-0.5 uppercase tracking-wider rounded-xs">
-                    Popular Choice
+              <Reveal key={p.id} delay={index * 70} className="h-full">
+                <article
+                  id={`pathway-${p.id}`}
+                  className={cn(
+                    "relative flex h-full scroll-mt-28 flex-col rounded-3xl p-6 sm:p-7",
+                    featured
+                      ? "bg-ivory text-ink shadow-[0_30px_60px_-24px_rgb(0_0_0/0.7)] ring-1 ring-gold-400/60"
+                      : "border border-white/10 bg-white/[0.035] transition-colors duration-300 hover:border-white/20",
+                  )}
+                >
+                  {featured ? (
+                    <span className="absolute -top-3 right-6 inline-flex items-center gap-1.5 rounded-full bg-gold-400 px-3 py-1 text-[0.75rem] font-bold text-forest-950 shadow-md">
+                      <Icon name="star" className="size-3.5" strokeWidth={2} />
+                      Most popular
+                    </span>
+                  ) : null}
+
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={cn(
+                        "flex size-11 items-center justify-center rounded-xl ring-1 ring-inset",
+                        featured
+                          ? "bg-forest-900 text-gold-300 ring-forest-900"
+                          : "bg-gold-400/10 text-gold-300 ring-gold-400/20",
+                      )}
+                    >
+                      <Icon name={p.icon} className="size-5" />
+                    </span>
+                    <span
+                      className={cn(
+                        "text-[0.8125rem] font-bold tracking-[0.1em] uppercase",
+                        featured ? "text-gold-700" : "text-gold-400",
+                      )}
+                    >
+                      {p.name}
+                    </span>
                   </div>
-                )}
 
-                <div>
-                  <span className="label text-gold-400 block mb-2">{p.name}</span>
-                  <h3 className="font-display text-xl sm:text-2xl text-paper leading-snug mb-3">{p.tagline}</h3>
-                  <p className="text-xs text-paper/60 mb-5">{p.targetAudience}</p>
+                  <h3
+                    className={cn(
+                      "font-display mt-6 text-[1.4375rem] leading-[1.25] tracking-[-0.01em] text-balance",
+                      featured ? "text-forest-900" : "text-paper",
+                    )}
+                  >
+                    {p.tagline}
+                  </h3>
+                  <p className={cn("mt-2.5 text-[0.875rem] leading-snug", featured ? "text-ink-soft" : "text-paper/60")}>
+                    {p.targetAudience}
+                  </p>
 
-                  <div className="border-t border-paper/10 pt-4 pb-4 space-y-3">
+                  <dl
+                    className={cn(
+                      "mt-6 grid grid-cols-2 gap-4 rounded-2xl p-4 xl:grid-cols-1 xl:gap-3",
+                      featured ? "bg-paper-alt/70" : "bg-black/15 ring-1 ring-white/[0.06]",
+                    )}
+                  >
                     <div>
-                      <span className="text-[10px] label text-paper/50 block">Entry Point</span>
-                      <span className="text-sm font-medium text-gold-300">{p.entryRequirement}</span>
+                      <dt className={cn("text-[0.75rem] font-medium", featured ? "text-ink-faint" : "text-paper/50")}>
+                        Entry point
+                      </dt>
+                      <dd className={cn("mt-1 text-[0.875rem] leading-snug font-semibold", featured ? "text-forest-900" : "text-gold-300")}>
+                        {p.entryRequirement}
+                      </dd>
                     </div>
                     <div>
-                      <span className="text-[10px] label text-paper/50 block">Timeline</span>
-                      <span className="text-sm font-medium text-paper">{p.timeline}</span>
+                      <dt className={cn("text-[0.75rem] font-medium", featured ? "text-ink-faint" : "text-paper/50")}>
+                        Timeline
+                      </dt>
+                      <dd className={cn("mt-1 text-[0.875rem] leading-snug font-semibold", featured ? "text-forest-900" : "text-paper")}>
+                        {p.timeline}
+                      </dd>
                     </div>
-                  </div>
+                  </dl>
 
-                  <div className="border-t border-paper/10 pt-4 space-y-2.5">
-                    <span className="text-[10px] label text-gold-400 block mb-1">Key Advantages</span>
-                    {p.features.map((feat, idx) => (
-                      <div key={idx} className="flex items-start gap-2 text-xs text-paper/80">
-                        <span className="text-gold-400 text-sm leading-none">✓</span>
-                        <span>{feat}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                  <CheckList
+                    items={p.features}
+                    tone={featured ? "light" : "dark"}
+                    size="sm"
+                    className="mt-6 mb-8"
+                  />
 
-                <div className="pt-6 mt-6 border-t border-paper/10">
                   <Link
                     href={`/join?pathway=${p.id}`}
-                    className={`label-sm block w-full text-center py-3 rounded-xs transition-colors ${
-                      p.highlight
-                        ? "bg-gold-400 text-forest-950 hover:bg-gold-300 font-semibold"
-                        : "border border-paper/20 text-paper hover:border-gold-400 hover:text-gold-300"
-                    }`}
+                    className={buttonClass(featured ? "dark" : "inverse", "md", "mt-auto w-full")}
                   >
-                    {p.ctaText} →
+                    {p.ctaText}
+                    <Icon name="arrow-right" className="size-4" strokeWidth={2} />
                   </Link>
-                </div>
-              </div>
+                </article>
+              </Reveal>
             );
           })}
         </div>
 
-        {/* Bottom Ladder Explainer */}
-        <div className="mt-12 bg-forest-950/60 border border-gold-400/20 p-6 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="space-y-1">
-            <span className="label text-gold-400">The Housing Ladder Operating System</span>
-            <p className="text-sm text-paper/80">
-              You are never stuck in one tier. You can start with <strong>Anchor START™</strong>, graduate to <strong>Anchor OWN™</strong>, move into <strong>Anchor LIVE™</strong>, and trade up to larger assets while building equity with <strong>Anchor GROW™</strong>.
-            </p>
+        {/* The ladder: members move between tiers rather than being boxed in. */}
+        <Reveal delay={120}>
+          <div className="mt-12 grid gap-8 rounded-3xl border border-gold-400/20 bg-linear-to-br from-forest-900/80 to-forest-950 p-7 sm:p-9 lg:grid-cols-12 lg:items-center lg:gap-10">
+            <div className="lg:col-span-7">
+              <p className="eyebrow text-gold-400">The housing ladder</p>
+              <p className="mt-3 max-w-2xl text-[1rem] leading-relaxed text-paper/80">
+                You are never stuck in one tier. You can start with{" "}
+                <strong className="font-semibold text-paper">Anchor START™</strong>, graduate to{" "}
+                <strong className="font-semibold text-paper">Anchor OWN™</strong>, move into{" "}
+                <strong className="font-semibold text-paper">Anchor LIVE™</strong>, and trade up to
+                larger assets while building equity with{" "}
+                <strong className="font-semibold text-paper">Anchor GROW™</strong>.
+              </p>
+            </div>
+            <div className="flex flex-col gap-6 lg:col-span-5 lg:items-end">
+              <ol className="flex w-full items-center justify-between gap-1 lg:max-w-sm">
+                {ladder.map((rung, index) => (
+                  <li key={rung} className="flex flex-1 items-center gap-1 last:flex-none">
+                    <span className="flex size-12 shrink-0 items-center justify-center rounded-full border border-gold-400/40 bg-forest-950 text-[0.6875rem] font-bold tracking-[0.06em] text-gold-300">
+                      {rung}
+                    </span>
+                    {index < ladder.length - 1 ? (
+                      <span aria-hidden="true" className="h-px flex-1 bg-linear-to-r from-gold-400/50 to-gold-400/15" />
+                    ) : null}
+                  </li>
+                ))}
+              </ol>
+              <ButtonAnchor href="#homepath" variant="primary" size="md" arrow>
+                Find my starting point
+              </ButtonAnchor>
+            </div>
           </div>
-          <a
-            href="#homepath"
-            className="label-sm px-6 py-3 border border-gold-400 text-gold-300 hover:bg-gold-400 hover:text-forest-950 transition-colors whitespace-nowrap"
-          >
-            Find My Starting Point
-          </a>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

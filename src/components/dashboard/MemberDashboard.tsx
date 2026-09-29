@@ -2,284 +2,327 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ButtonLink } from "../ui/Button";
+import { cn, naira } from "../ui/cn";
+import { Icon, type IconName } from "../ui/Icons";
+import { Pill, card } from "../ui/primitives";
+import { Tabs, tabPanelProps } from "../ui/Tabs";
+
+type Tab = "overview" | "credit" | "transactions";
+
+const member = {
+  name: "Dr. Dayo Popoola",
+  initials: "DP",
+  memberId: "ANC-00842-FCT",
+  tier: "Investing Member (Tier 1)",
+  joined: "14 January 2026",
+  totalContribution: 3750000,
+  ownershipSlots: 750,
+  portfolioValue: 4410000,
+  homeSavings: 1850000,
+  anchorScore: 718,
+  targetHouse: "Anchor Gardens Phase 2 (2-Bed)",
+  targetPrice: 25000000,
+  ownershipProgress: 68,
+  projectedDate: "March 2029",
+  dividendEarned: 285400,
+  nextContribution: "30 September 2026",
+  depositGap: 3200000,
+  projectsOwnedCount: 3,
+};
+
+const assets = [
+  {
+    title: "Anchor Gardens — Kuje",
+    type: "Residential Co-ownership",
+    slots: 400,
+    progress: "74% Constructed",
+    status: "Roofing & MEP Phase",
+    dna: "FCDA R-of-O #KJ-2024",
+    icon: "home" as IconName,
+  },
+  {
+    title: "Idu Logistics Hub Phase 1",
+    type: "Commercial Warehousing Asset",
+    slots: 250,
+    progress: "100% Tenanted",
+    status: "Yielding 21% Annual Net Rent",
+    dna: "Certificate of Occupancy #ID-882",
+    icon: "package" as IconName,
+  },
+  {
+    title: "Lugbe Smart Micro-Community",
+    type: "Save-to-Own Allocated Unit",
+    slots: 100,
+    progress: "38% Site Preparation",
+    status: "Earthworks underway",
+    dna: "Cadastral Layout Approved",
+    icon: "map" as IconName,
+  },
+];
+
+const ledger = [
+  { date: "30 Aug 2026", description: "Monthly Savings Allocation", slots: "+36 slots", amount: "₦180,000", status: "Confirmed" },
+  { date: "15 Aug 2026", description: "Q2 2026 Asset Dividend Payout", slots: "+14 slots", amount: "₦71,350", status: "Reinvested" },
+  { date: "30 Jul 2026", description: "Monthly Savings Allocation", slots: "+36 slots", amount: "₦180,000", status: "Confirmed" },
+];
+
+const kpis: { label: string; value: string; note: string; icon: IconName; accent?: "gold" | "mint" }[] = [
+  { label: "Total contribution", value: naira(member.totalContribution), note: "Documented ledger equity", icon: "coins" },
+  { label: "Ownership slots held", value: `${member.ownershipSlots.toLocaleString()} slots`, note: "0.075% of cooperative pool", icon: "grid", accent: "gold" },
+  { label: "Current portfolio value", value: naira(member.portfolioValue), note: "+17.6% capital appreciation", icon: "trending", accent: "mint" },
+  { label: "Total dividends earned", value: naira(member.dividendEarned), note: "Auto-reinvested in slots", icon: "sparkle" },
+];
 
 export function MemberDashboard() {
-  const [activeTab, setActiveTab] = useState<"overview" | "projects" | "transactions" | "credit">("overview");
-
-  const member = {
-    name: "Dr. Dayo Popoola",
-    memberId: "ANC-00842-FCT",
-    tier: "Investing Member (Tier 1)",
-    joined: "14 January 2026",
-    totalContribution: 3750000,
-    ownershipSlots: 750,
-    portfolioValue: 4410000,
-    homeSavings: 1850000,
-    anchorScore: 718,
-    targetHouse: "Anchor Gardens Phase 2 (2-Bed)",
-    targetPrice: 25000000,
-    ownershipProgress: 68,
-    projectedDate: "March 2029",
-    dividendEarned: 285400,
-    nextContribution: "30 September 2026",
-    depositGap: 3200000,
-    projectsOwnedCount: 3,
-  };
-
-  const formatNaira = (val: number) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-      maximumFractionDigits: 0,
-    }).format(val).replace("NGN", "₦");
-  };
+  const [activeTab, setActiveTab] = useState<Tab>("overview");
 
   return (
-    <div className="bg-forest-950 text-paper min-h-screen py-10">
-      <div className="shell space-y-8">
-        {/* Top Member Header */}
-        <div className="bg-forest-900 border border-gold-400/25 p-6 sm:p-8 rounded-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-1">
-            <div className="flex items-center gap-3">
-              <span className="label text-gold-400">MY ANCHOR · Personal Wealth Portal</span>
-              <span className="text-[10px] label px-2 py-0.5 bg-gold-400/10 text-gold-300 border border-gold-400/30 rounded-xs">
-                {member.tier}
+    <>
+      {/* Identity band */}
+      <div className="relative isolate overflow-hidden bg-forest-950 text-paper">
+        <div aria-hidden="true" className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-[radial-gradient(90%_100%_at_0%_0%,rgb(43_115_88/0.5),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(40%_60%_at_100%_0%,rgb(217_190_114/0.12),transparent_70%)]" />
+        </div>
+
+        <div className="shell pt-28 pb-28 md:pt-40">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="eyebrow text-gold-400">My Anchor · Personal wealth portal</p>
+            <Pill tone="neutral-dark" icon="info">
+              Preview with sample data
+            </Pill>
+          </div>
+
+          <div className="mt-6 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="flex items-center gap-5">
+              <span className="font-display flex size-16 shrink-0 items-center justify-center rounded-full bg-gold-400 text-[1.5rem] text-forest-950 shadow-[0_0_0_4px_rgb(217_190_114/0.2)]">
+                {member.initials}
               </span>
-            </div>
-            <h1 className="font-display text-3xl sm:text-4xl text-paper">{member.name}</h1>
-            <p className="text-xs text-paper/60 font-mono">Member ID: {member.memberId} · Joined {member.joined}</p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="bg-forest-950 border border-gold-400/30 px-5 py-3 rounded-sm text-right">
-              <span className="label-sm text-paper/60 block">AnchorScore™</span>
-              <div className="flex items-baseline gap-2 justify-end">
-                <span className="font-display text-3xl text-gold-300 font-bold">{member.anchorScore}</span>
-                <span className="text-xs text-emerald-400">/ 850</span>
-              </div>
-              <span className="text-[10px] text-emerald-400 block font-mono">Home Finance Ready</span>
-            </div>
-
-            <Link
-              href="/join"
-              className="label-sm bg-gold-400 text-forest-950 px-5 py-3.5 hover:bg-gold-300 transition-colors rounded-xs font-semibold whitespace-nowrap"
-            >
-              + Top Up Monthly Slots
-            </Link>
-          </div>
-        </div>
-
-        {/* Homeownership Journey Banner */}
-        <div className="bg-forest-900/80 border-l-4 border-gold-400 p-6 rounded-r-sm space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <span className="label text-gold-400">Your Path to Homeownership</span>
-            <span className="text-xs text-gold-300 font-mono">Target: {member.targetHouse} ({formatNaira(member.targetPrice)})</span>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-paper/80 font-medium">Ownership Progress</span>
-              <span className="font-mono text-gold-300 font-bold">{member.ownershipProgress}%</span>
-            </div>
-            <div className="h-3 w-full bg-forest-950 rounded-full overflow-hidden border border-paper/10">
-              <div
-                className="h-full bg-gold-400 transition-all duration-500 rounded-full"
-                style={{ width: `${member.ownershipProgress}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 text-xs text-paper/75 gap-2">
-            <div>
-              <strong className="text-paper">{formatNaira(member.depositGap)}</strong> more required to reach your 25% deposit threshold.
-            </div>
-            <div className="text-gold-300 font-mono">
-              Projected Home-Ready Date: <strong>{member.projectedDate}</strong>
-            </div>
-          </div>
-        </div>
-
-        {/* Wealth & Capital KPI Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-forest-900 border border-paper/10 p-5 rounded-sm">
-            <span className="label-sm text-paper/60">Total Contribution</span>
-            <div className="font-display text-2xl text-paper mt-1">{formatNaira(member.totalContribution)}</div>
-            <span className="text-[11px] text-paper/50 mt-1 block">Documented ledger equity</span>
-          </div>
-
-          <div className="bg-forest-900 border border-paper/10 p-5 rounded-sm">
-            <span className="label-sm text-paper/60">Ownership Slots Held</span>
-            <div className="font-display text-2xl text-gold-300 mt-1">{member.ownershipSlots.toLocaleString()} Slots</div>
-            <span className="text-[11px] text-paper/50 mt-1 block">0.075% of cooperative pool</span>
-          </div>
-
-          <div className="bg-forest-900 border border-paper/10 p-5 rounded-sm">
-            <span className="label-sm text-paper/60">Current Portfolio Value</span>
-            <div className="font-display text-2xl text-emerald-400 mt-1">{formatNaira(member.portfolioValue)}</div>
-            <span className="text-[11px] text-emerald-400/80 mt-1 block">+17.6% capital appreciation</span>
-          </div>
-
-          <div className="bg-forest-900 border border-paper/10 p-5 rounded-sm">
-            <span className="label-sm text-paper/60">Total Dividends Earned</span>
-            <div className="font-display text-2xl text-gold-300 mt-1">{formatNaira(member.dividendEarned)}</div>
-            <span className="text-[11px] text-paper/50 mt-1 block">Auto-reinvested in slots</span>
-          </div>
-        </div>
-
-        {/* Navigation Tabs */}
-        <div className="flex border-b border-gold-400/20 bg-forest-900/40 rounded-t-sm">
-          {[
-            { id: "overview", label: "My Real Estate Assets (3)" },
-            { id: "credit", label: "AnchorScore™ Credit DNA" },
-            { id: "transactions", label: "Ledger & Statements" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id as "overview" | "projects" | "transactions" | "credit")}
-              className={`label-sm px-6 py-3.5 border-b-2 transition-colors ${
-                activeTab === tab.id
-                  ? "border-gold-400 text-gold-300 font-bold bg-forest-900/60"
-                  : "border-transparent text-paper/60 hover:text-paper"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Active Tab: Assets */}
-        {activeTab === "overview" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fadeIn">
-            {[
-              {
-                title: "Anchor Gardens — Kuje",
-                type: "Residential Co-ownership",
-                slots: 400,
-                progress: "74% Constructed",
-                status: "Roofing & MEP Phase",
-                dna: "FCDA R-of-O #KJ-2024",
-              },
-              {
-                title: "Idu Logistics Hub Phase 1",
-                type: "Commercial Warehousing Asset",
-                slots: 250,
-                progress: "100% Tenanted",
-                status: "Yielding 21% Annual Net Rent",
-                dna: "Certificate of Occupancy #ID-882",
-              },
-              {
-                title: "Lugbe Smart Micro-Community",
-                type: "Save-to-Own Allocated Unit",
-                slots: 100,
-                progress: "38% Site Preparation",
-                status: "Earthworks underway",
-                dna: "Cadastral Layout Approved",
-              },
-            ].map((proj, idx) => (
-              <div key={idx} className="bg-forest-900 border border-gold-400/20 p-5 rounded-sm space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] label text-gold-400">{proj.type}</span>
-                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
-                    {proj.progress}
-                  </span>
-                </div>
-                <div>
-                  <h4 className="font-display text-xl text-paper">{proj.title}</h4>
-                  <p className="text-xs text-paper/60 mt-0.5">{proj.dna}</p>
-                </div>
-                <div className="bg-forest-950 p-3 rounded-xs border border-paper/10 text-xs flex justify-between">
-                  <span className="text-paper/60">Your Stake:</span>
-                  <span className="text-gold-300 font-mono font-bold">{proj.slots} Slots ({formatNaira(proj.slots * 5000)})</span>
-                </div>
-                <div className="text-xs text-paper/75 flex items-center justify-between pt-1">
-                  <span>{proj.status}</span>
-                  <a href="#property-dna" className="text-gold-400 hover:underline">
-                    View DNA →
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Active Tab: Credit DNA */}
-        {activeTab === "credit" && (
-          <div className="bg-forest-900 border border-gold-400/20 p-6 sm:p-8 rounded-sm space-y-6 animate-fadeIn">
-            <h3 className="font-display text-2xl text-paper">Your AnchorScore™ Factor Breakdown</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-forest-950 p-4 rounded-sm border border-paper/10 space-y-1">
-                <span className="label-sm text-gold-400">Contribution Discipline (35% Weight)</span>
-                <p className="text-sm font-semibold text-paper">100% On-Time (8 Consecutive Months)</p>
-                <p className="text-xs text-paper/60">Regular ₦180,000 monthly debits processed without default.</p>
-              </div>
-              <div className="bg-forest-950 p-4 rounded-sm border border-paper/10 space-y-1">
-                <span className="label-sm text-gold-400">Cooperative Social Collateral (25% Weight)</span>
-                <p className="text-sm font-semibold text-paper">2 Vetted Guarantors Active</p>
-                <p className="text-xs text-paper/60">Endorsed by Tier 1 Executive member and FCT cooperative trustee.</p>
+              <div>
+                <h1 className="font-display text-[2rem] leading-tight tracking-[-0.02em] sm:text-[2.5rem]">
+                  {member.name}
+                </h1>
+                <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.875rem] text-paper/60">
+                  <span>{member.tier}</span>
+                  <span aria-hidden="true" className="size-1 rounded-full bg-paper/30" />
+                  <span className="tnum">ID {member.memberId}</span>
+                  <span aria-hidden="true" className="size-1 rounded-full bg-paper/30" />
+                  <span>Joined {member.joined}</span>
+                </p>
               </div>
             </div>
-          </div>
-        )}
 
-        {/* Active Tab: Transactions */}
-        {activeTab === "transactions" && (
-          <div className="bg-forest-900 border border-gold-400/20 p-6 rounded-sm space-y-4 animate-fadeIn">
-            <h3 className="font-display text-2xl text-paper">Verified Society Ledger Entries</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-paper/80">
-                <thead className="border-b border-paper/10 text-paper/50 label-sm">
-                  <tr>
-                    <th className="py-2.5">Date</th>
-                    <th className="py-2.5">Description</th>
-                    <th className="py-2.5">Slots</th>
-                    <th className="py-2.5">Amount</th>
-                    <th className="py-2.5 text-right">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-paper/5 font-mono">
-                  <tr>
-                    <td className="py-3">30 Aug 2026</td>
-                    <td>Monthly Savings Allocation</td>
-                    <td>+36 slots</td>
-                    <td className="text-gold-300">₦180,000</td>
-                    <td className="text-right text-emerald-400">Confirmed</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3">15 Aug 2026</td>
-                    <td>Q2 2026 Asset Dividend Payout</td>
-                    <td>+14 slots</td>
-                    <td className="text-emerald-400">₦71,350</td>
-                    <td className="text-right text-emerald-400">Reinvested</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3">30 Jul 2026</td>
-                    <td>Monthly Savings Allocation</td>
-                    <td>+36 slots</td>
-                    <td className="text-gold-300">₦180,000</td>
-                    <td className="text-right text-emerald-400">Confirmed</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div className="flex shrink-0 flex-wrap items-center gap-3 lg:flex-nowrap">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3">
+                <p className="text-[0.75rem] font-medium text-paper/55">AnchorScore™</p>
+                <p className="mt-0.5 flex items-baseline gap-2">
+                  <span className="figure-num text-[1.75rem] leading-none text-gold-300">{member.anchorScore}</span>
+                  <span className="text-[0.8125rem] text-paper/50">/ 850</span>
+                  <Pill tone="mint-dark" className="ml-1">
+                    Home finance ready
+                  </Pill>
+                </p>
+              </div>
+              <ButtonLink href="/join" size="lg" arrow>
+                Top up monthly slots
+              </ButtonLink>
             </div>
-          </div>
-        )}
-
-        {/* Quick Footer Links */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gold-400/20">
-          <Link href="/" className="label-sm text-gold-400 hover:text-gold-300">
-            ← Back to Anchor Public Portal
-          </Link>
-          <div className="flex items-center gap-4">
-            <a href="#bulkbuy" className="label-sm text-paper/70 hover:text-paper">
-              Anchor BulkBuy™
-            </a>
-            <a href="#exchange" className="label-sm text-paper/70 hover:text-paper">
-              Property Exchange™
-            </a>
           </div>
         </div>
       </div>
-    </div>
+
+      <div className="bg-paper pb-20">
+        <div className="shell relative z-10 -mt-16 space-y-6">
+          {/* KPIs */}
+          <dl className="grid grid-cols-1 gap-4 xs:grid-cols-2 lg:grid-cols-4">
+            {kpis.map((kpi) => (
+              <div key={kpi.label} className={cn(card, "p-5 sm:p-6")}>
+                <dt className="flex items-center justify-between gap-3 text-[0.8125rem] font-medium text-ink-faint">
+                  {kpi.label}
+                  <Icon name={kpi.icon} className="size-5 text-forest-600" />
+                </dt>
+                <dd>
+                  <p
+                    className={cn(
+                      "figure-num mt-3 text-[1.625rem] leading-none",
+                      kpi.accent === "mint" ? "text-mint-700" : kpi.accent === "gold" ? "text-gold-700" : "text-forest-900",
+                    )}
+                  >
+                    {kpi.value}
+                  </p>
+                  <p className={cn("mt-2 text-[0.8125rem]", kpi.accent === "mint" ? "text-mint-700" : "text-ink-faint")}>
+                    {kpi.note}
+                  </p>
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          {/* Homeownership journey */}
+          <div className={cn(card, "p-6 sm:p-8")}>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="eyebrow text-gold-700">Your path to homeownership</p>
+                <h2 className="font-display mt-2 text-[1.5rem] leading-tight text-forest-900 sm:text-[1.75rem]">
+                  {member.targetHouse}
+                </h2>
+              </div>
+              <p className="text-[0.9375rem] text-ink-soft sm:text-right">
+                Target price
+                <span className="figure-num block text-[1.5rem] text-forest-900">{naira(member.targetPrice)}</span>
+              </p>
+            </div>
+
+            <div className="mt-6">
+              <div className="flex items-center justify-between text-[0.875rem]">
+                <span className="font-medium text-ink">Ownership progress</span>
+                <span className="font-semibold text-forest-900 tnum">{member.ownershipProgress}%</span>
+              </div>
+              <div className="mt-2 h-3 overflow-hidden rounded-full bg-forest-900/[0.08]">
+                <div
+                  className="h-full rounded-full bg-linear-to-r from-forest-600 to-forest-800"
+                  style={{ width: `${member.ownershipProgress}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              <div className="rounded-2xl bg-paper/80 p-4 ring-1 ring-forest-900/[0.06]">
+                <p className="text-[0.8125rem] text-ink-faint">To your 25% deposit</p>
+                <p className="mt-1 text-[1.0625rem] font-semibold text-forest-900 tnum">{naira(member.depositGap)} more</p>
+              </div>
+              <div className="rounded-2xl bg-paper/80 p-4 ring-1 ring-forest-900/[0.06]">
+                <p className="text-[0.8125rem] text-ink-faint">Projected home-ready date</p>
+                <p className="mt-1 text-[1.0625rem] font-semibold text-forest-900">{member.projectedDate}</p>
+              </div>
+              <div className="rounded-2xl bg-paper/80 p-4 ring-1 ring-forest-900/[0.06]">
+                <p className="text-[0.8125rem] text-ink-faint">Next contribution</p>
+                <p className="mt-1 text-[1.0625rem] font-semibold text-forest-900">{member.nextContribution}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Detail tabs */}
+          <div className={cn(card, "overflow-hidden")}>
+            <div className="px-6 pt-5 sm:px-8">
+              <Tabs
+                tabs={[
+                  { id: "overview", label: `My real estate assets (${member.projectsOwnedCount})` },
+                  { id: "credit", label: "AnchorScore™ credit DNA" },
+                  { id: "transactions", label: "Ledger & statements" },
+                ]}
+                value={activeTab}
+                onChange={setActiveTab}
+                idBase="dash"
+                label="Member dashboard"
+                variant="underline"
+              />
+            </div>
+
+            <div className="p-6 sm:p-8" {...tabPanelProps("dash", activeTab)}>
+              {activeTab === "overview" && (
+                <ul className="animate-fade-in grid gap-5 md:grid-cols-3">
+                  {assets.map((proj) => (
+                    <li key={proj.title} className="flex flex-col rounded-2xl border border-forest-900/10 bg-white/60 p-5">
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="flex size-10 items-center justify-center rounded-xl bg-forest-900 text-gold-300">
+                          <Icon name={proj.icon} className="size-5" />
+                        </span>
+                        <Pill tone="mint">{proj.progress}</Pill>
+                      </div>
+                      <p className="mt-4 text-[0.75rem] font-semibold tracking-[0.06em] text-gold-700 uppercase">{proj.type}</p>
+                      <h3 className="font-display mt-1 text-[1.25rem] leading-snug text-forest-900">{proj.title}</h3>
+                      <p className="mt-1 text-[0.8125rem] text-ink-faint">{proj.dna}</p>
+                      <div className="mt-4 flex items-baseline justify-between rounded-xl bg-paper/80 px-3.5 py-3 text-[0.875rem] ring-1 ring-forest-900/[0.06]">
+                        <span className="text-ink-soft">Your stake</span>
+                        <span className="font-semibold text-forest-900 tnum">
+                          {proj.slots} slots · {naira(proj.slots * 5000)}
+                        </span>
+                      </div>
+                      <div className="mt-auto flex items-center justify-between gap-3 pt-4 text-[0.875rem]">
+                        <span className="text-ink-soft">{proj.status}</span>
+                        <Link href="/#property-dna" className="inline-flex shrink-0 items-center gap-1 font-semibold text-forest-700 hover:text-forest-900">
+                          View DNA
+                          <Icon name="arrow-right" className="size-4" />
+                        </Link>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {activeTab === "credit" && (
+                <div className="animate-fade-in space-y-5">
+                  <h3 className="font-display text-[1.5rem] text-forest-900">Your AnchorScore™ factor breakdown</h3>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="rounded-2xl border border-forest-900/10 bg-white/60 p-5">
+                      <p className="text-[0.8125rem] font-semibold text-gold-700">Contribution discipline · 35% weight</p>
+                      <p className="mt-2 text-[1.0625rem] font-semibold text-forest-900">100% on-time (8 consecutive months)</p>
+                      <p className="mt-1 text-[0.875rem] text-ink-soft">Regular ₦180,000 monthly debits processed without default.</p>
+                    </div>
+                    <div className="rounded-2xl border border-forest-900/10 bg-white/60 p-5">
+                      <p className="text-[0.8125rem] font-semibold text-gold-700">Cooperative social collateral · 25% weight</p>
+                      <p className="mt-2 text-[1.0625rem] font-semibold text-forest-900">2 vetted guarantors active</p>
+                      <p className="mt-1 text-[0.875rem] text-ink-soft">Endorsed by Tier 1 Executive member and FCT cooperative trustee.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "transactions" && (
+                <div className="animate-fade-in">
+                  <h3 className="font-display text-[1.5rem] text-forest-900">Verified Society ledger entries</h3>
+                  <div className="mt-5 overflow-x-auto">
+                    <table className="w-full min-w-[40rem] text-left text-[0.9375rem]">
+                      <thead>
+                        <tr className="border-b border-forest-900/10 text-[0.8125rem] text-ink-faint">
+                          <th scope="col" className="pb-3 font-medium">Date</th>
+                          <th scope="col" className="pb-3 font-medium">Description</th>
+                          <th scope="col" className="pb-3 font-medium">Slots</th>
+                          <th scope="col" className="pb-3 font-medium">Amount</th>
+                          <th scope="col" className="pb-3 text-right font-medium">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-forest-900/[0.07]">
+                        {ledger.map((row) => (
+                          <tr key={`${row.date}-${row.description}`}>
+                            <td className="py-4 pr-4 text-ink-soft tnum">{row.date}</td>
+                            <td className="py-4 pr-4 font-medium text-forest-900">{row.description}</td>
+                            <td className="py-4 pr-4 text-ink-soft tnum">{row.slots}</td>
+                            <td className="py-4 pr-4 font-semibold text-forest-900 tnum">{row.amount}</td>
+                            <td className="py-4 text-right">
+                              <Pill tone="mint" icon="check">
+                                {row.status}
+                              </Pill>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Quick links */}
+          <div className="flex flex-col gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
+            <Link href="/" className="inline-flex items-center gap-2 text-[0.875rem] font-semibold text-forest-700 hover:text-forest-900">
+              <Icon name="arrow-left" className="size-4" />
+              Back to the public site
+            </Link>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/#bulkbuy" className="rounded-full border border-forest-900/15 bg-ivory px-4 py-2 text-[0.875rem] font-medium text-forest-900 transition-colors hover:border-forest-900/35">
+                Anchor BulkBuy™
+              </Link>
+              <Link href="/#exchange" className="rounded-full border border-forest-900/15 bg-ivory px-4 py-2 text-[0.875rem] font-medium text-forest-900 transition-colors hover:border-forest-900/35">
+                Property Exchange™
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

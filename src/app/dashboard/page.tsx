@@ -12,7 +12,7 @@ export default function DashboardPage() {
   return (
     <>
       <SiteHeader />
-      <main className="pt-16 min-h-screen bg-forest-950">
+      <main id="main" className="min-h-screen flex-1 bg-paper">
         <MemberDashboard />
       </main>
       <SiteFooter />

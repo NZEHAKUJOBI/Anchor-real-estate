@@ -86,7 +86,7 @@ export function ServiceIcon({
       aria-hidden="true"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.2"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >

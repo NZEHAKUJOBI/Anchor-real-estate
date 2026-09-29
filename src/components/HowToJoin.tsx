@@ -1,92 +1,111 @@
-import Link from "next/link";
 import { Reveal } from "./Reveal";
-import { SectionHeading } from "./SectionHeading";
+import { Accent, SectionHeading } from "./SectionHeading";
+import { ButtonLink } from "./ui/Button";
+import { Icon } from "./ui/Icons";
 import { email, joinCaveat, joinSteps, phones } from "@/lib/content";
 
 export function HowToJoin() {
   return (
-    <section id="join" className="bg-paper-alt py-24 md:py-32">
+    <section id="join" className="bg-paper-alt py-20 md:py-28">
       <div className="shell">
         <Reveal>
           <SectionHeading
-            index="08"
-            title="How to Join"
+            layout="split"
+            eyebrow="How to join"
+            title={
+              <>
+                From interest to <Accent>membership.</Accent>
+              </>
+            }
             lead="Four steps, in order. The Society is at the point of constituting its founding cohort of two hundred members."
           />
         </Reveal>
 
         <Reveal delay={80}>
-          <ol className="grid gap-x-10 sm:grid-cols-2 lg:grid-cols-4">
+          <ol className="relative grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+            {/* Connecting rule behind the step markers on wide screens. */}
+            <span
+              aria-hidden="true"
+              className="absolute top-[2.75rem] right-[12.5%] left-[12.5%] hidden h-px bg-linear-to-r from-gold-500/60 via-gold-500/30 to-gold-500/60 lg:block"
+            />
             {joinSteps.map((step, index) => (
-              <li key={step.title} className="border-t border-rule pt-7 pb-9">
-                <span className="figure-num block text-[2rem] leading-none text-gold-600">
-                  {String(index + 1).padStart(2, "0")}
+              <li key={step.title} className="relative rounded-3xl border border-forest-900/10 bg-ivory p-6 lg:text-center">
+                <span className="figure-num relative flex size-11 items-center justify-center rounded-full bg-forest-900 text-[1.125rem] text-gold-300 ring-4 ring-paper-alt lg:mx-auto">
+                  {index + 1}
                 </span>
-                <h3 className="font-display mt-6 text-[1.125rem] leading-snug text-forest-900">
-                  {step.title}
-                </h3>
-                <p className="mt-2.5 text-[0.9375rem] leading-relaxed text-ink-soft">
-                  {step.body}
-                </p>
+                <h3 className="mt-5 text-[1.0625rem] leading-snug font-semibold text-forest-900">{step.title}</h3>
+                <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-soft">{step.body}</p>
               </li>
             ))}
           </ol>
         </Reveal>
 
         <Reveal delay={140}>
-          <p className="mt-10 max-w-3xl border-l-2 border-gold-600 pl-5 text-[0.9375rem] leading-relaxed text-ink-soft">
+          <p className="mt-6 flex max-w-3xl items-start gap-3 text-[0.9375rem] leading-relaxed text-ink-soft">
+            <Icon name="info" className="mt-0.5 size-5 shrink-0 text-gold-700" />
             {joinCaveat}
           </p>
         </Reveal>
 
         <Reveal delay={180}>
-          <div className="mt-16 bg-forest-950 px-7 py-12 text-paper sm:px-12 sm:py-14">
-            <div className="grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-12">
-              <div className="lg:col-span-6">
-                <h3 className="font-display text-[1.75rem] leading-[1.2] text-balance sm:text-[2.125rem]">
+          <div className="relative mt-14 overflow-hidden rounded-[2rem] bg-forest-950 text-paper">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-[radial-gradient(70%_100%_at_0%_0%,rgb(43_115_88/0.55),transparent_60%),radial-gradient(50%_80%_at_100%_100%,rgb(217_190_114/0.14),transparent_70%)]"
+            />
+            <div className="relative grid grid-cols-1 gap-10 p-7 sm:p-12 lg:grid-cols-12 lg:items-center lg:gap-12 lg:p-14">
+              <div className="lg:col-span-7">
+                <p className="eyebrow text-gold-400">Founding cohort now forming</p>
+                <h3 className="font-display mt-4 text-[2rem] leading-[1.1] tracking-[-0.02em] text-balance sm:text-[2.75rem]">
                   Register your interest with the Secretariat
                 </h3>
                 <p className="mt-4 max-w-md text-[1.0625rem] leading-relaxed text-paper/70">
-                  Complete the short form and we will be in touch. Membership
-                  documentation follows once the Board finalises it.
+                  Complete the short form and we will be in touch. Membership documentation follows
+                  once the Board finalises it.
                 </p>
-                <Link
-                  href="/join"
-                  className="label mt-8 inline-block bg-gold-400 px-7 py-4 text-forest-950 transition-colors duration-200 hover:bg-gold-300"
-                >
-                  Register Your Interest
-                </Link>
+                <div className="mt-8 flex flex-col gap-3 xs:flex-row">
+                  <ButtonLink href="/join" size="lg" arrow>
+                    Register your interest
+                  </ButtonLink>
+                  <ButtonLink href="/dashboard" size="lg" variant="inverse">
+                    Explore My Anchor
+                  </ButtonLink>
+                </div>
               </div>
 
-              <div className="lg:col-span-6">
-                <dl className="grid gap-x-8 sm:grid-cols-2">
-                  <div className="border-t border-paper/20 pt-5 pb-2">
-                    <dt className="label-sm text-paper/55">Telephone</dt>
-                    <dd className="mt-3 space-y-1.5">
+              <div className="lg:col-span-5">
+                <dl className="space-y-3">
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+                    <dt className="flex items-center gap-2 text-[0.8125rem] font-medium text-paper/55">
+                      <Icon name="phone" className="size-4 text-gold-400" />
+                      Telephone
+                    </dt>
+                    <dd className="mt-2 space-y-1">
                       {phones.map((phone) => (
                         <a
                           key={phone}
                           href={`tel:${phone.replace(/\s/g, "")}`}
-                          className="block text-[0.9375rem] text-gold-300 tnum transition-colors duration-200 hover:text-gold-400"
+                          className="block text-[1.0625rem] font-medium text-paper tnum transition-colors hover:text-gold-300"
                         >
                           {phone}
                         </a>
                       ))}
                     </dd>
                   </div>
-                  <div className="border-t border-paper/20 pt-5 pb-2">
-                    <dt className="label-sm text-paper/55">Email</dt>
-                    <dd className="mt-3">
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+                    <dt className="flex items-center gap-2 text-[0.8125rem] font-medium text-paper/55">
+                      <Icon name="mail" className="size-4 text-gold-400" />
+                      Email
+                    </dt>
+                    <dd className="mt-2">
                       <a
                         href={`mailto:${email.address}`}
-                        className="block text-[0.9375rem] break-all text-gold-300 transition-colors duration-200 hover:text-gold-400"
+                        className="block text-[1.0625rem] font-medium break-all text-paper transition-colors hover:text-gold-300"
                       >
                         {email.address}
                       </a>
                       {email.provisional ? (
-                        <span className="label-sm mt-2 block text-paper/55">
-                          Interim address
-                        </span>
+                        <span className="mt-1 block text-[0.8125rem] text-paper/55">Interim address</span>
                       ) : null}
                     </dd>
                   </div>

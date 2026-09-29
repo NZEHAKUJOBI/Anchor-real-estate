@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { cn } from "@/components/ui/cn";
+import { Icon } from "@/components/ui/Icons";
+import { buttonClass } from "@/components/ui/Button";
 import {
   MAX_INVESTOR_SLOTS,
   MIN_INVESTOR_SLOTS,
@@ -15,7 +18,7 @@ import { formatNaira } from "@/lib/money";
 import { submitEnquiry, type EnquiryFormState } from "./actions";
 
 const control =
-  "w-full border border-forest-900/20 bg-white px-3.5 py-3 text-[0.9375rem] text-ink placeholder:text-ink-faint focus:border-gold-600 focus:outline-none";
+  "w-full rounded-xl border border-forest-900/15 bg-white px-3.5 py-3 text-[0.9375rem] text-ink placeholder:text-ink-faint/80 transition-colors focus:border-forest-700 focus:ring-2 focus:ring-forest-700/15 focus:outline-none aria-[invalid=true]:border-alert/60";
 
 function Field({
   label,
@@ -34,13 +37,16 @@ function Field({
 }) {
   return (
     <div>
-      <label htmlFor={name} className="label-sm block text-ink-soft">
+      <label htmlFor={name} className="block text-[0.875rem] font-medium text-ink">
         {label}
         {required ? <span className="text-alert"> *</span> : null}
       </label>
       <div className="mt-2">{children}</div>
       {error ? (
-        <p className="mt-2 text-[0.8125rem] text-alert">{error}</p>
+        <p className="mt-2 flex items-center gap-1.5 text-[0.8125rem] text-alert">
+          <Icon name="info" className="size-4 shrink-0" />
+          {error}
+        </p>
       ) : hint ? (
         <p className="mt-2 text-[0.8125rem] text-ink-faint">{hint}</p>
       ) : null}
@@ -56,10 +62,22 @@ function Submit() {
       type="submit"
       disabled={pending}
       aria-busy={pending}
-      className="label bg-forest-900 px-8 py-4 text-paper transition-colors duration-200 hover:bg-forest-800 disabled:cursor-not-allowed disabled:opacity-55"
+      className={buttonClass("dark", "lg", "w-full sm:w-auto")}
     >
-      {pending ? "Submitting…" : "Register My Interest"}
+      {pending ? "Submitting…" : "Register my interest"}
+      {pending ? null : <Icon name="arrow-right" className="size-4" strokeWidth={2} />}
     </button>
+  );
+}
+
+function Legend({ step, children }: { step: number; children: React.ReactNode }) {
+  return (
+    <legend className="flex items-center gap-3">
+      <span className="flex size-7 items-center justify-center rounded-full bg-forest-900 text-[0.8125rem] font-semibold text-gold-300">
+        {step}
+      </span>
+      <span className="font-display text-[1.375rem] text-forest-900">{children}</span>
+    </legend>
   );
 }
 
@@ -73,42 +91,41 @@ export function EnquiryForm() {
 
   if (state.reference) {
     return (
-      <div className="border-t-2 border-gold-500 bg-paper px-7 py-12 sm:px-10">
-        <p className="label text-gold-700">Enquiry received</p>
-        <h2 className="font-display mt-5 text-[1.75rem] leading-tight text-forest-900 sm:text-[2rem]">
+      <div className="py-4 text-center sm:py-8">
+        <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-mint-500/12 text-mint-700">
+          <Icon name="check" className="size-7" strokeWidth={2.2} />
+        </span>
+        <p className="eyebrow mt-6 text-gold-700">Enquiry received</p>
+        <h2 className="font-display mt-3 text-[1.75rem] leading-tight text-forest-900 sm:text-[2rem]">
           Thank you — we have your details.
         </h2>
-        <p className="mt-5 max-w-xl text-[1.0625rem] leading-relaxed text-ink-soft">
+        <p className="mx-auto mt-4 max-w-md text-[1.0625rem] leading-relaxed text-ink-soft">
           Your reference is{" "}
-          <strong className="tnum text-forest-900">{state.reference}</strong>.
-          Please quote it in any correspondence. A member of the Secretariat
-          will contact you.
+          <strong className="rounded-md bg-forest-900/[0.06] px-2 py-0.5 font-semibold text-forest-900 tnum">
+            {state.reference}
+          </strong>
+          . Please quote it in any correspondence. A member of the Secretariat will contact you.
         </p>
 
         {state.mailDelayed ? (
-          <p className="mt-6 max-w-xl border-l-2 border-gold-600 pl-5 text-[0.9375rem] leading-relaxed text-ink-soft">
-            We could not send your confirmation email just now, but your enquiry
-            is safely recorded. If you do not hear from us within a few days,
-            call the Secretariat on{" "}
-            <a href="tel:+2349025250026" className="underline underline-offset-4">
+          <p className="mx-auto mt-6 max-w-md rounded-2xl border border-gold-500/30 bg-gold-50 px-5 py-4 text-left text-[0.9375rem] leading-relaxed text-ink-soft">
+            We could not send your confirmation email just now, but your enquiry is safely
+            recorded. If you do not hear from us within a few days, call the Secretariat on{" "}
+            <a href="tel:+2349025250026" className="font-medium text-forest-900 underline underline-offset-4">
               +234 902 525 0026
             </a>
             .
           </p>
         ) : (
-          <p className="mt-6 text-[0.9375rem] text-ink-soft">
+          <p className="mt-5 text-[0.9375rem] text-ink-soft">
             A confirmation has been sent to your email address.
           </p>
         )}
 
-        <p className="mt-9">
-          <Link
-            href="/"
-            className="label-sm text-forest-900 underline-offset-4 hover:underline"
-          >
-            ← Back to the Society
-          </Link>
-        </p>
+        <Link href="/" className={buttonClass("outline", "md", "mt-9")}>
+          <Icon name="arrow-left" className="size-4" strokeWidth={2} />
+          Back to the Society
+        </Link>
       </div>
     );
   }
@@ -118,12 +135,13 @@ export function EnquiryForm() {
     Number.isInteger(slotCount) && slotCount > 0 ? slotCount * SLOT_PRICE_KOBO : 0;
 
   return (
-    <form action={action} className="space-y-8" noValidate>
+    <form action={action} className="space-y-10" noValidate>
       {state.error ? (
         <div
           role="alert"
-          className="border-l-2 border-alert bg-alert-soft px-4 py-3 text-[0.9375rem] text-alert"
+          className="flex items-start gap-3 rounded-2xl border border-alert/25 bg-alert-soft px-4 py-3.5 text-[0.9375rem] text-alert"
         >
+          <Icon name="info" className="mt-0.5 size-5 shrink-0" />
           {state.error}
         </div>
       ) : null}
@@ -135,20 +153,20 @@ export function EnquiryForm() {
       </div>
 
       <fieldset className="space-y-6">
-        <legend className="label text-gold-700">Your details</legend>
+        <Legend step={1}>Your details</Legend>
 
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           <Field label="First name" name="firstName" error={state.fieldErrors?.firstName} required>
-            <input id="firstName" name="firstName" className={control} autoComplete="given-name" required />
+            <input id="firstName" name="firstName" className={control} autoComplete="given-name" aria-invalid={Boolean(state.fieldErrors?.firstName) || undefined} required />
           </Field>
           <Field label="Surname" name="lastName" error={state.fieldErrors?.lastName} required>
-            <input id="lastName" name="lastName" className={control} autoComplete="family-name" required />
+            <input id="lastName" name="lastName" className={control} autoComplete="family-name" aria-invalid={Boolean(state.fieldErrors?.lastName) || undefined} required />
           </Field>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           <Field label="Email" name="email" error={state.fieldErrors?.email} required>
-            <input id="email" name="email" type="email" className={control} autoComplete="email" required />
+            <input id="email" name="email" type="email" className={control} autoComplete="email" aria-invalid={Boolean(state.fieldErrors?.email) || undefined} required />
           </Field>
           <Field
             label="Phone"
@@ -157,11 +175,11 @@ export function EnquiryForm() {
             hint="Include the network code, e.g. 0803…"
             required
           >
-            <input id="phone" name="phone" type="tel" className={control} autoComplete="tel" required />
+            <input id="phone" name="phone" type="tel" className={control} autoComplete="tel" aria-invalid={Boolean(state.fieldErrors?.phone) || undefined} required />
           </Field>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           <Field label="Occupation" name="occupation" error={state.fieldErrors?.occupation}>
             <input id="occupation" name="occupation" className={control} autoComplete="organization-title" />
           </Field>
@@ -175,40 +193,45 @@ export function EnquiryForm() {
         </Field>
       </fieldset>
 
-      <fieldset className="space-y-6 border-t border-rule pt-8">
-        <legend className="label text-gold-700">Your interest</legend>
+      <fieldset className="space-y-6 border-t border-forest-900/[0.08] pt-9">
+        <Legend step={2}>Your interest</Legend>
 
-        <Field
-          label="Which tier interests you?"
-          name="tierInterest"
-          error={state.fieldErrors?.tierInterest}
-          required
-        >
-          <div className="space-y-3">
-            {TIER_INTERESTS.map((value) => (
-              <label
-                key={value}
-                className={`flex cursor-pointer items-start gap-3 border px-4 py-3.5 transition-colors ${
-                  tier === value
-                    ? "border-gold-600 bg-gold-400/10"
-                    : "border-forest-900/20 hover:bg-forest-900/[0.03]"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="tierInterest"
-                  value={value}
-                  checked={tier === value}
-                  onChange={() => setTier(value)}
-                  className="mt-1 accent-forest-800"
-                />
-                <span className="text-[0.9375rem] leading-snug text-ink">
-                  {TIER_INTEREST_LABEL[value]}
-                </span>
-              </label>
-            ))}
+        <div>
+          <p id="tier-label" className="text-[0.875rem] font-medium text-ink">
+            Which tier interests you?<span className="text-alert"> *</span>
+          </p>
+          <div role="radiogroup" aria-labelledby="tier-label" className="mt-3 grid gap-3">
+            {TIER_INTERESTS.map((value) => {
+              const selected = tier === value;
+              return (
+                <label
+                  key={value}
+                  className={cn(
+                    "flex cursor-pointer items-start gap-3.5 rounded-2xl border px-4 py-4 transition-[border-color,background-color,box-shadow]",
+                    selected
+                      ? "border-forest-700 bg-forest-50 shadow-[0_0_0_1px_var(--color-forest-700)]"
+                      : "border-forest-900/15 bg-white hover:border-forest-900/30",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="tierInterest"
+                    value={value}
+                    checked={selected}
+                    onChange={() => setTier(value)}
+                    className="mt-0.5 size-4 accent-forest-700"
+                  />
+                  <span className="text-[0.9375rem] leading-snug text-ink">
+                    {TIER_INTEREST_LABEL[value]}
+                  </span>
+                </label>
+              );
+            })}
           </div>
-        </Field>
+          {state.fieldErrors?.tierInterest ? (
+            <p className="mt-2 text-[0.8125rem] text-alert">{state.fieldErrors.tierInterest}</p>
+          ) : null}
+        </div>
 
         {tier === "investor" ? (
           <Field
@@ -232,7 +255,7 @@ export function EnquiryForm() {
               value={slots}
               onChange={(event) => setSlots(event.target.value)}
               placeholder="e.g. 100"
-              className={control}
+              className={cn(control, "sm:max-w-xs")}
             />
           </Field>
         ) : null}
@@ -246,11 +269,12 @@ export function EnquiryForm() {
         </Field>
       </fieldset>
 
-      <div className="border-t border-rule pt-7">
-        <p className="mb-6 max-w-xl text-[0.875rem] leading-relaxed text-ink-soft">
-          Submitting this form registers your interest only. It does not create
-          membership and commits you to no payment. The Society will send the
-          formal documentation once the Board has adopted it.
+      <div className="border-t border-forest-900/[0.08] pt-8">
+        <p className="mb-6 flex max-w-xl gap-3 text-[0.875rem] leading-relaxed text-ink-soft">
+          <Icon name="shield" className="mt-0.5 size-5 shrink-0 text-forest-600" />
+          Submitting this form registers your interest only. It does not create membership and
+          commits you to no payment. The Society will send the formal documentation once the
+          Board has adopted it.
         </p>
         <Submit />
       </div>

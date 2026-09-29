@@ -65,12 +65,16 @@ export function AdminSidebar({
             href="/admin"
             className="hidden items-center gap-3 px-6 py-6 text-paper lg:flex"
           >
-            <Crest size={36} className="h-9 w-9 shrink-0" />
+            <Crest
+              size={80}
+              className="size-10 shrink-0 rounded-full shadow-[0_0_0_1px_rgb(217_190_114/0.25)]"
+            />
+            <span aria-hidden="true" className="h-8 w-px shrink-0 bg-gold-400/30" />
             <span>
-              <span className="font-display block text-[0.9375rem] leading-tight">
+              <span className="font-display block text-[0.875rem] leading-none font-semibold tracking-[0.08em] uppercase">
                 Anchor Admin
               </span>
-              <span className="label-sm block text-gold-400/75">
+              <span className="mt-1.5 block text-[0.5625rem] leading-none font-semibold tracking-[0.2em] text-gold-400 uppercase">
                 Secretariat
               </span>
             </span>

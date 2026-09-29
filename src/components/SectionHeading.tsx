@@ -1,54 +1,125 @@
 import type { ReactNode } from "react";
+import { cn } from "./ui/cn";
 
 /**
- * Numbered section head. The index sits in the left gutter against a gold
- * hairline that runs out to the measure — the device that ties the page
- * together in place of boxes or cards.
+ * Section head: a short gold rule and eyebrow, the serif title, and an
+ * optional lead. `split` sets the lead beside the title on wide screens —
+ * the editorial layout used where the lead is long enough to deserve it.
  */
 export function SectionHeading({
-  index,
+  eyebrow,
   title,
   lead,
   tone = "light",
+  align = "left",
+  layout = "stack",
+  action,
+  className,
 }: {
-  index: string;
-  title: string;
+  eyebrow: string;
+  title: ReactNode;
   lead?: ReactNode;
   tone?: "light" | "dark";
+  align?: "left" | "center";
+  layout?: "stack" | "split";
+  action?: ReactNode;
+  className?: string;
 }) {
   const dark = tone === "dark";
+  const centered = align === "center";
+
+  const eyebrowEl = (
+    <p
+      className={cn(
+        "eyebrow flex items-center gap-3",
+        centered && "justify-center",
+        dark ? "text-gold-400" : "text-gold-700",
+      )}
+    >
+      <span aria-hidden="true" className="h-px w-7 bg-current opacity-70" />
+      {eyebrow}
+      {centered ? (
+        <span aria-hidden="true" className="h-px w-7 bg-current opacity-70" />
+      ) : null}
+    </p>
+  );
+
+  const titleEl = (
+    <h2
+      className={cn(
+        "font-display mt-5 text-[2.125rem] leading-[1.06] font-normal tracking-[-0.022em] text-balance sm:text-[2.625rem] lg:text-[3.125rem]",
+        dark ? "text-paper" : "text-forest-900",
+      )}
+    >
+      {title}
+    </h2>
+  );
+
+  const leadEl = lead ? (
+    <p
+      className={cn(
+        "text-[1.0625rem] leading-[1.65] text-pretty sm:text-[1.125rem]",
+        dark ? "text-paper/70" : "text-ink-soft",
+      )}
+    >
+      {lead}
+    </p>
+  ) : null;
+
+  if (layout === "split") {
+    return (
+      <header
+        className={cn(
+          "mb-12 grid gap-6 md:mb-16 lg:grid-cols-12 lg:items-end lg:gap-12",
+          className,
+        )}
+      >
+        <div className="lg:col-span-7">
+          {eyebrowEl}
+          {titleEl}
+        </div>
+        {leadEl || action ? (
+          <div className="space-y-6 lg:col-span-5 lg:pb-1.5">
+            {leadEl}
+            {action}
+          </div>
+        ) : null}
+      </header>
+    );
+  }
 
   return (
-    <header className="mb-12 md:mb-16">
-      <div className="flex items-center gap-4">
-        <span
-          className={`label-sm shrink-0 ${dark ? "text-gold-400" : "text-gold-700"}`}
-        >
-          {index}
-        </span>
-        <span
-          aria-hidden="true"
-          className={`h-px flex-1 ${dark ? "bg-gold-400/30" : "bg-gold-600/35"}`}
-        />
-      </div>
-
-      <h2
-        className={`font-display mt-5 text-[2rem] leading-[1.12] font-normal tracking-[-0.02em] text-balance sm:text-[2.5rem] md:text-[3rem] ${
-          dark ? "text-paper" : "text-forest-900"
-        }`}
-      >
-        {title}
-      </h2>
-
-      {lead ? (
-        <p
-          className={`mt-5 max-w-2xl text-[1.0625rem] leading-[1.6] text-pretty ${
-            dark ? "text-paper/70" : "text-ink-soft"
-          }`}
-        >
-          {lead}
-        </p>
-      ) : null}
+    <header
+      className={cn(
+        "mb-12 md:mb-14",
+        centered ? "mx-auto max-w-3xl text-center" : "max-w-3xl",
+        className,
+      )}
+    >
+      {eyebrowEl}
+      {titleEl}
+      {leadEl ? <div className="mt-5">{leadEl}</div> : null}
+      {action ? <div className="mt-8">{action}</div> : null}
     </header>
+  );
+}
+
+/** Italic accent inside a section title. */
+export function Accent({
+  children,
+  tone = "light",
+}: {
+  children: ReactNode;
+  tone?: "light" | "dark";
+}) {
+  return (
+    <em
+      className={cn(
+        "font-display italic",
+        tone === "dark" ? "text-gold-300" : "text-forest-600",
+      )}
+    >
+      {children}
+    </em>
   );
 }

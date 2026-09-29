@@ -1,81 +1,117 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import Link from "next/link";
+import { Accent, SectionHeading } from "../SectionHeading";
+import { buttonClass } from "../ui/Button";
+import { cn, naira, rangeFill } from "../ui/cn";
+import { Icon, type IconName } from "../ui/Icons";
+import { Pill, card } from "../ui/primitives";
 
 interface CoOwner {
+  id: number;
   name: string;
   relation: string;
   share: number; // percentage
 }
 
+const MEMBER_COLOURS = [
+  "bg-forest-800",
+  "bg-forest-600",
+  "bg-gold-500",
+  "bg-forest-400",
+  "bg-gold-300",
+  "bg-mint-500",
+  "bg-clay-400",
+  "bg-forest-300",
+];
+
+const PRICES = [25000000, 35000000, 50000000, 80000000];
+
+const safeguards: { title: string; body: string; icon: IconName }[] = [
+  {
+    title: "Proportionate deeded title",
+    body: "Each member’s name and exact percentage is recorded on the sub-lease and cooperative share registry.",
+    icon: "file",
+  },
+  {
+    title: "Buyout & succession rules",
+    body: "If one co-buyer encounters financial changes, existing members enjoy right-of-first-refusal, or Anchor liquidity kicks in.",
+    icon: "scale",
+  },
+  {
+    title: "Transparent split billing",
+    body: "Each member receives dedicated payment links and statements for their exact portion.",
+    icon: "users",
+  },
+];
+
 export function OwnershipCircles() {
   const [propertyPrice, setPropertyPrice] = useState(35000000);
   const [owners, setOwners] = useState<CoOwner[]>([
-    { name: "Dayo", relation: "Lead / Sibling 1", share: 30 },
-    { name: "Tunde", relation: "Sibling 2", share: 20 },
-    { name: "Amina", relation: "Sibling 3", share: 20 },
-    { name: "Bola", relation: "Sibling 4", share: 15 },
-    { name: "Grace", relation: "Sibling 5", share: 15 },
+    { id: 1, name: "Dayo", relation: "Lead / Sibling 1", share: 30 },
+    { id: 2, name: "Tunde", relation: "Sibling 2", share: 20 },
+    { id: 3, name: "Amina", relation: "Sibling 3", share: 20 },
+    { id: 4, name: "Bola", relation: "Sibling 4", share: 15 },
+    { id: 5, name: "Grace", relation: "Sibling 5", share: 15 },
   ]);
+  const nextId = useRef(6);
 
   const totalShare = owners.reduce((acc, curr) => acc + curr.share, 0);
+  const balanced = totalShare === 100;
 
-  const updateShare = (index: number, newShare: number) => {
-    const updated = [...owners];
-    updated[index].share = newShare;
-    setOwners(updated);
-  };
+  const update = (id: number, patch: Partial<CoOwner>) =>
+    setOwners((list) => list.map((o) => (o.id === id ? { ...o, ...patch } : o)));
 
   const addOwner = () => {
     if (owners.length >= 8) return;
-    setOwners([...owners, { name: `Partner ${owners.length + 1}`, relation: "Co-Buyer", share: 10 }]);
+    const id = nextId.current++;
+    setOwners((list) => [
+      ...list,
+      { id, name: `Partner ${list.length + 1}`, relation: "Co-Buyer", share: 10 },
+    ]);
   };
 
-  const removeOwner = (idx: number) => {
+  const removeOwner = (id: number) => {
     if (owners.length <= 2) return;
-    setOwners(owners.filter((_, i) => i !== idx));
-  };
-
-  const formatNaira = (val: number) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-      maximumFractionDigits: 0,
-    }).format(val).replace("NGN", "₦");
+    setOwners((list) => list.filter((o) => o.id !== id));
   };
 
   return (
-    <section id="circles" className="py-24 bg-forest-900 text-paper border-b border-gold-500/30">
+    <section id="circles" className="bg-paper py-20 md:py-28">
       <div className="shell">
-        <div className="max-w-3xl mb-12">
-          <p className="label text-gold-400">Pillar 09 · Collaborative Syndication</p>
-          <h2 className="font-display mt-3 text-3xl sm:text-4xl lg:text-5xl text-paper">
-            Create an Ownership Circle™
-          </h2>
-          <p className="mt-4 text-paper/75 text-lg">
-            Five siblings buying a home for their parents. Four colleagues co-investing in rental real estate. A diaspora association acquiring 20 homes. Anchor’s legal technology makes group ownership seamless and fully documented.
-          </p>
-        </div>
+        <SectionHeading
+          layout="split"
+          eyebrow="Ownership Circles™ · Buy together"
+          title={
+            <>
+              Own it <Accent>together,</Accent> on paper.
+            </>
+          }
+          lead="Five siblings buying a home for their parents. Four colleagues co-investing in rental real estate. A diaspora association acquiring 20 homes. Anchor’s legal technology makes group ownership seamless and fully documented."
+        />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          {/* Circle Configurator */}
-          <div className="lg:col-span-7 bg-forest-950 border border-gold-400/25 p-6 sm:p-8 rounded-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-paper/10 pb-4">
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+          {/* Configurator */}
+          <div className={cn(card, "rounded-3xl p-6 sm:p-8 lg:col-span-7")}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <span className="label-sm text-gold-400">Circle Target Asset</span>
-                <div className="font-display text-2xl text-paper mt-0.5">{formatNaira(propertyPrice)}</div>
+                <p className="text-[0.8125rem] font-medium text-ink-faint">Circle target asset</p>
+                <p className="figure-num mt-1 text-[2rem] leading-none text-forest-900">{naira(propertyPrice)}</p>
               </div>
-              <div className="flex items-center gap-2">
-                {[25000000, 35000000, 50000000, 80000000].map((price) => (
+              <div role="group" aria-label="Target asset price" className="inline-flex gap-1 rounded-full bg-forest-900/[0.06] p-1">
+                {PRICES.map((price) => (
                   <button
                     key={price}
                     type="button"
+                    aria-pressed={propertyPrice === price}
                     onClick={() => setPropertyPrice(price)}
-                    className={`text-xs px-2.5 py-1 rounded border transition-colors ${
+                    className={cn(
+                      "rounded-full px-3.5 py-1.5 text-[0.8125rem] font-semibold transition-colors",
                       propertyPrice === price
-                        ? "border-gold-400 bg-gold-400/20 text-gold-300"
-                        : "border-paper/20 text-paper/70 hover:border-paper/40"
-                    }`}
+                        ? "bg-ivory text-forest-900 shadow-[0_1px_3px_rgb(7_31_23/0.12)]"
+                        : "text-ink-soft hover:text-forest-900",
+                    )}
                   >
                     ₦{price / 1000000}m
                   </button>
@@ -83,120 +119,149 @@ export function OwnershipCircles() {
               </div>
             </div>
 
-            {/* Members List */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs label text-paper/60">
-                <span>Circle Members & Proportional Allocation</span>
-                <span className={totalShare === 100 ? "text-emerald-400 font-bold" : "text-amber-400 font-bold"}>
-                  Total: {totalShare}% {totalShare !== 100 && "(Must equal 100%)"}
-                </span>
+            {/* The split, at a glance */}
+            <div className="mt-7">
+              <div className="flex h-3 overflow-hidden rounded-full bg-forest-900/[0.06]" aria-hidden="true">
+                {owners.map((owner, index) => (
+                  <span
+                    key={owner.id}
+                    className={cn(MEMBER_COLOURS[index % MEMBER_COLOURS.length], "h-full border-r-2 border-ivory transition-[width] duration-300 last:border-r-0")}
+                    style={{ width: `${(owner.share / Math.max(100, totalShare)) * 100}%` }}
+                  />
+                ))}
               </div>
+              <div className="mt-3 flex items-center justify-between text-[0.8125rem]">
+                <span className="text-ink-faint">Circle members &amp; proportional allocation</span>
+                <Pill tone={balanced ? "mint" : "clay"} icon={balanced ? "check" : "info"}>
+                  Total {totalShare}%{balanced ? "" : " · must equal 100%"}
+                </Pill>
+              </div>
+            </div>
 
+            <ul className="mt-6 space-y-3">
               {owners.map((owner, idx) => {
                 const individualCost = Math.round((propertyPrice * owner.share) / 100);
                 const monthlyPayment = Math.round(individualCost / 36); // 36-month timeline
-
                 return (
-                  <div key={idx} className="bg-forest-900/80 border border-paper/10 p-4 rounded-sm space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div className="flex items-center gap-3">
-                        <span className="h-6 w-6 rounded-full bg-forest-800 text-gold-400 font-mono text-xs flex items-center justify-center font-bold">
-                          {idx + 1}
+                  <li key={owner.id} className="rounded-2xl border border-forest-900/10 bg-white/60 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            "flex size-9 shrink-0 items-center justify-center rounded-full text-[0.8125rem] font-bold",
+                            MEMBER_COLOURS[idx % MEMBER_COLOURS.length],
+                            idx % MEMBER_COLOURS.length === 2 || idx % MEMBER_COLOURS.length === 4
+                              ? "text-forest-950"
+                              : "text-ivory",
+                          )}
+                        >
+                          {owner.name.trim().charAt(0).toUpperCase() || idx + 1}
                         </span>
-                        <div>
+                        <div className="min-w-0">
                           <input
                             type="text"
                             value={owner.name}
-                            onChange={(e) => {
-                              const updated = [...owners];
-                              updated[idx].name = e.target.value;
-                              setOwners(updated);
-                            }}
-                            className="bg-transparent border-b border-paper/20 text-sm font-semibold text-paper focus:outline-none focus:border-gold-400 py-0.5"
+                            aria-label={`Member ${idx + 1} name`}
+                            onChange={(e) => update(owner.id, { name: e.target.value })}
+                            className="w-full max-w-[11rem] rounded-md border border-transparent bg-transparent px-1.5 py-0.5 -ml-1.5 text-[0.9375rem] font-semibold text-forest-900 hover:border-forest-900/15 focus:border-forest-700 focus:bg-white focus:outline-none"
                           />
-                          <span className="text-xs text-paper/50 block">{owner.relation}</span>
+                          <span className="block text-[0.8125rem] text-ink-faint">{owner.relation}</span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         <div className="text-right">
-                          <span className="text-sm font-mono font-bold text-gold-300">{formatNaira(individualCost)}</span>
-                          <span className="text-[11px] text-paper/60 block">~{formatNaira(monthlyPayment)}/mo (36 mos)</span>
+                          <span className="block text-[0.9375rem] font-semibold text-forest-900 tnum">
+                            {naira(individualCost)}
+                          </span>
+                          <span className="block text-[0.75rem] text-ink-faint tnum">
+                            ~{naira(monthlyPayment)}/mo · 36 mos
+                          </span>
                         </div>
-                        {owners.length > 2 && (
+                        {owners.length > 2 ? (
                           <button
                             type="button"
-                            onClick={() => removeOwner(idx)}
-                            className="text-paper/40 hover:text-red-400 text-sm px-1"
-                            title="Remove member"
+                            onClick={() => removeOwner(owner.id)}
+                            className="flex size-8 items-center justify-center rounded-full text-ink-faint transition-colors hover:bg-alert-soft hover:text-alert"
+                            aria-label={`Remove ${owner.name || `member ${idx + 1}`}`}
                           >
-                            ✕
+                            <Icon name="close" className="size-4" />
                           </button>
-                        )}
+                        ) : null}
                       </div>
                     </div>
 
-                    {/* Share Slider */}
-                    <div className="flex items-center gap-3">
+                    <div className="mt-3 flex items-center gap-3">
                       <input
                         type="range"
                         min="5"
                         max="80"
                         value={owner.share}
-                        onChange={(e) => updateShare(idx, Number(e.target.value))}
-                        className="w-full accent-gold-400 h-1.5 bg-forest-950 rounded cursor-pointer"
+                        aria-label={`${owner.name || `Member ${idx + 1}`} share`}
+                        onChange={(e) => update(owner.id, { share: Number(e.target.value) })}
+                        className="range"
+                        style={rangeFill(owner.share, 5, 80)}
                       />
-                      <span className="font-mono text-xs font-bold text-gold-300 w-10 text-right">{owner.share}%</span>
+                      <span className="w-11 text-right text-[0.875rem] font-semibold text-forest-900 tnum">
+                        {owner.share}%
+                      </span>
                     </div>
-                  </div>
+                  </li>
                 );
               })}
+            </ul>
 
-              {owners.length < 8 && (
-                <button
-                  type="button"
-                  onClick={addOwner}
-                  className="w-full py-2.5 border border-dashed border-gold-400/40 text-gold-300 hover:border-gold-400 hover:bg-gold-400/10 text-xs label rounded-sm transition-colors"
-                >
-                  + Add Member to Circle
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Legal Framework & Execution */}
-          <div className="lg:col-span-5 bg-forest-950 border border-gold-400/30 p-6 sm:p-8 rounded-sm space-y-6">
-            <span className="label text-gold-400">Institutional Governance</span>
-            <h3 className="font-display text-2xl text-paper">Co-Tenancy Legal Deed</h3>
-            <p className="text-xs text-paper/75 leading-relaxed">
-              Every Ownership Circle is backed by an automated <strong>Tenancy-in-Common (TIC) Agreement</strong> registered with the High Court and Anchor Cooperative Trustees.
-            </p>
-
-            <div className="space-y-3 pt-2">
-              <div className="bg-forest-900 p-3.5 rounded-sm border border-paper/10 text-xs text-paper/85">
-                <span className="font-semibold text-gold-300 block mb-1">✓ Proportionate Deeded Title</span>
-                Each member’s name and exact percentage is recorded on the sub-lease and cooperative share registry.
-              </div>
-              <div className="bg-forest-900 p-3.5 rounded-sm border border-paper/10 text-xs text-paper/85">
-                <span className="font-semibold text-gold-300 block mb-1">✓ Buyout & Succession Rules</span>
-                If one co-buyer encounters financial changes, existing members enjoy right-of-first-refusal, or Anchor liquidity kicks in.
-              </div>
-              <div className="bg-forest-900 p-3.5 rounded-sm border border-paper/10 text-xs text-paper/85">
-                <span className="font-semibold text-gold-300 block mb-1">✓ Transparent Split Billing</span>
-                Each member receives dedicated payment links and statements for their exact portion.
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-paper/10 space-y-3">
+            {owners.length < 8 ? (
               <button
                 type="button"
-                className="w-full label bg-gold-400 text-forest-950 py-3.5 hover:bg-gold-300 transition-colors"
+                onClick={addOwner}
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-forest-900/25 py-3.5 text-[0.875rem] font-semibold text-forest-700 transition-colors hover:border-forest-700 hover:bg-forest-50"
               >
-                Generate Ownership Circle Link
+                <Icon name="plus" className="size-4" strokeWidth={2} />
+                Add member to circle
               </button>
-              <p className="text-[11px] text-center text-paper/50">
-                Share with siblings or co-investors to begin collaborative onboarding.
+            ) : null}
+          </div>
+
+          {/* Legal framework */}
+          <div className="relative overflow-hidden rounded-3xl bg-forest-950 p-6 text-paper sm:p-8 lg:col-span-5">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-[radial-gradient(90%_60%_at_100%_0%,rgb(217_190_114/0.12),transparent_60%)]"
+            />
+            <div className="relative">
+              <p className="eyebrow text-gold-400">Institutional governance</p>
+              <h3 className="font-display mt-2 text-[1.75rem] leading-tight">Co-tenancy legal deed</h3>
+              <p className="mt-3 text-[0.9375rem] leading-relaxed text-paper/70">
+                Every Ownership Circle is backed by an automated{" "}
+                <strong className="font-semibold text-paper">Tenancy-in-Common (TIC) Agreement</strong>{" "}
+                registered with the High Court and Anchor Cooperative Trustees.
               </p>
+
+              <ul className="mt-7 space-y-5">
+                {safeguards.map((item) => (
+                  <li key={item.title} className="flex gap-4">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gold-400/10 text-gold-300 ring-1 ring-gold-400/20 ring-inset">
+                      <Icon name={item.icon} className="size-5" />
+                    </span>
+                    <div>
+                      <p className="text-[0.9375rem] font-semibold text-paper">{item.title}</p>
+                      <p className="mt-1 text-[0.875rem] leading-relaxed text-paper/65">{item.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-8 border-t border-white/10 pt-6">
+                <Link href="/join?pathway=circle" className={buttonClass("primary", "lg", "w-full")}>
+                  Start an Ownership Circle
+                  <Icon name="arrow-right" className="size-4" strokeWidth={2} />
+                </Link>
+                <p className="mt-3 text-center text-[0.8125rem] text-paper/50">
+                  Registering interest commits you to no payment.
+                </p>
+              </div>
             </div>
           </div>
         </div>
