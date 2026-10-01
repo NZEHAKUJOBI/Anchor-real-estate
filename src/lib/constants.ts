@@ -14,7 +14,7 @@ export const REGISTRATION_FEE_KOBO = 2_000_000; // ₦20,000
 export const DUES_INVESTOR_KOBO = 1_000_000; // ₦10,000 / month
 export const DUES_NON_INVESTOR_KOBO = 5_000_000; // ₦50,000 / month
 
-/** 1,000,000 slots × ₦5,000 — the ₦5bn mobilization target. */
+/** 1,000,000 slots × ₦5,000 — the ₦5bn mobilisation target. */
 export const CAPITAL_TARGET_KOBO = TOTAL_SLOT_POOL * SLOT_PRICE_KOBO;
 export const MEMBERSHIP_TARGET = 200;
 

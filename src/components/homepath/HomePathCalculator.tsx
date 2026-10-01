@@ -37,7 +37,7 @@ type Step = {
 
 const propertyOptions = [
   { id: "plot", name: "Serviced Residential Plot", price: 8000000, desc: "Titled land banking in developing FCT corridors" },
-  { id: "starter", name: "1-Bed Urban Starter", price: 18000000, desc: "Compact modern studio/apartment for young professionals" },
+  { id: "starter", name: "1-Bed Urban Starter", price: 18000000, desc: "Compact modern studio/apartment for young professionals and retirees scaling down" },
   { id: "2bed", name: "2-Bed Smart Apartment", price: 28000000, desc: "Energy-efficient 2-bedroom home in planned community" },
   { id: "3bed", name: "3-Bed Family Terrace", price: 48000000, desc: "Multi-level family residence with solar standard" },
   { id: "villa", name: "4-Bed Detached Villa", price: 85000000, desc: "Executive home with private grounds & smart amenities" },

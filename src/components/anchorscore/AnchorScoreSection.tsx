@@ -129,7 +129,7 @@ export function AnchorScoreSection() {
                   How do people without payslips become <Accent>mortgageable?</Accent>
                 </>
               }
-              lead="Conventional banking cannot see informal income. If you earn as a trader, artisan, consultant, Uber driver, contractor, or diaspora entrepreneur, traditional mortgages shut the door."
+              lead="Conventional banking cannot see informal income. If you earn as a trader, artisan, consultant, driver, contractor, or diaspora entrepreneur, traditional mortgages shut the door."
               className="mb-10 md:mb-10"
             />
 

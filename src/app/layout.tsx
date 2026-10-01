@@ -29,7 +29,7 @@ const plexMono = IBM_Plex_Mono({
 });
 
 const description =
-  "A member-owned multipurpose cooperative society limited in Abuja, FCT. Ownership slots of ₦5,000, a ₦5 billion mobilization target, and member capital deployed across housing, tourism, warehousing and financial inclusion.";
+  "A member-owned multipurpose cooperative society limited in Abuja, FCT. Ownership slots of ₦5,000, a ₦5 billion mobilisation target, and member capital deployed across housing, tourism, warehousing and financial inclusion.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://anchorrealestategroup.ng"),

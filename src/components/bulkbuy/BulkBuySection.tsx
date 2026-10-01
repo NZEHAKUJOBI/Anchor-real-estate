@@ -64,7 +64,7 @@ const bulkCatalog: BulkItem[] = [
   {
     id: "fiber-insurance",
     category: "Services",
-    name: "Annual Comprehensive Home Insurance + 1Gbps Fiber Internet (12 Months)",
+    name: "Annual Comprehensive Home Insurance + 1Gbps Fibre Internet (12 Months)",
     retailPrice: 720000,
     memberPrice: 490000,
     partner: "Leadway Assurance & FibreOne",

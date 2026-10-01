@@ -31,7 +31,7 @@ const poolMetrics = [
   { label: "Verified member backers", value: "500 Buyers", note: "AnchorScore > 700", noteClass: "text-mint-700" },
   { label: "Target price window", value: "₦25m – ₦30m", note: "Sub-market negotiated", noteClass: "text-ink-faint" },
   { label: "Active developer bids", value: "4 Tenders", note: "Under technical audit", noteClass: "text-gold-700" },
-  { label: "Tender closing date", value: "31 Oct 2026", note: "Final evaluation", noteClass: "text-clay-600" },
+  { label: "Tender closing date", value: "TBC", note: "Set when the pool opens", noteClass: "text-clay-600" },
 ];
 
 const field =
@@ -74,7 +74,7 @@ export function DeveloperMarketplace() {
 
         <Tabs
           tabs={[
-            { id: "reverse-bidding", label: "Live bidding pools" },
+            { id: "reverse-bidding", label: "Sample bidding pool" },
             { id: "developer-intake", label: "Build with Anchor" },
           ]}
           value={activeTab}
@@ -91,8 +91,8 @@ export function DeveloperMarketplace() {
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <Pill tone="neutral">Syndicate pool #ABJ-04</Pill>
-                    <Pill tone="mint" dot>
-                      Tender open for bids
+                    <Pill tone="gold" dot>
+                      Illustrative example
                     </Pill>
                   </div>
                   <h3 className="font-display mt-4 max-w-2xl text-[1.625rem] leading-tight tracking-[-0.015em] text-forest-900 sm:text-[2rem]">
@@ -131,7 +131,7 @@ export function DeveloperMarketplace() {
 
               <div className="p-6 sm:p-8">
                 <h4 className="text-[0.8125rem] font-semibold tracking-[0.06em] text-ink-faint uppercase">
-                  Live developer tender submissions
+                  Sample developer tender submissions
                 </h4>
                 <div className="mt-4 overflow-x-auto">
                   <table className="w-full min-w-[44rem] text-left text-[0.9375rem]">
@@ -170,6 +170,10 @@ export function DeveloperMarketplace() {
                     </tbody>
                   </table>
                 </div>
+                <p className="mt-5 text-[0.8125rem] leading-relaxed text-ink-faint">
+                  Illustrative only. Pool figures and developer names show how reverse bidding will
+                  work; live tenders open once the programme launches.
+                </p>
               </div>
             </div>
           )}

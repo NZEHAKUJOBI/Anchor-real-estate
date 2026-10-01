@@ -15,7 +15,7 @@ export function AtAGlance() {
                 A large target, reached in <Accent>small, equal parts.</Accent>
               </>
             }
-            lead="The Society's mobilization is deliberately granular: a large target reached through small, equally priced units, so that a founding cohort of two hundred can hold it between them without any one member dominating."
+            lead="The Society's mobilisation is deliberately granular: a large target reached through small, equally priced units, so that a founding cohort of two hundred can hold it between them without any one member dominating."
           />
         </Reveal>
 

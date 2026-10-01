@@ -131,8 +131,8 @@ export const siteNav: NavItem[] = [
 
 export const headlineFigure = {
   value: "₦5.0bn",
-  label: "Capital mobilization target",
-  note: "The Society's total mobilization objective across the full slot pool.",
+  label: "Capital mobilisation target",
+  note: "The Society's total mobilisation objective across the full slot pool.",
 };
 
 export const glanceFigures = [
@@ -148,12 +148,12 @@ export const glanceFigures = [
 
 export const vision = {
   heading: "Vision",
-  body: "To be a leading member-owned real estate and multipurpose cooperative in Nigeria, recognized for creating inclusive pathways to property ownership, wealth-building and shared prosperity.",
+  body: "To be a leading member-owned real estate and multipurpose cooperative in Nigeria, creating inclusive pathways to property ownership, wealth-building and shared prosperity.",
 };
 
 export const mission = {
   heading: "Mission",
-  body: "To mobilize member capital responsibly and transparently, delivering affordable, well-governed real estate, tourism, financial-inclusion and social-impact programmes across the FCT and beyond.",
+  body: "To mobilise member capital responsibly and transparently, delivering affordable, well-governed real estate, tourism, financial-inclusion and social-impact programmes across the FCT and beyond.",
 };
 
 export const values = [
