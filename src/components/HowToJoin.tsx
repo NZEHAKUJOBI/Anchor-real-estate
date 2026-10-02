@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Reveal } from "./Reveal";
 import { Accent, SectionHeading } from "./SectionHeading";
 import { ButtonLink } from "./ui/Button";
@@ -43,7 +44,15 @@ export function HowToJoin() {
         <Reveal delay={140}>
           <p className="mt-6 flex max-w-3xl items-start gap-3 text-[0.9375rem] leading-relaxed text-ink-soft">
             <Icon name="info" className="mt-0.5 size-5 shrink-0 text-gold-700" />
-            {joinCaveat}
+            <span>
+              {joinCaveat}{" "}
+              <Link
+                href="/join"
+                className="font-medium text-forest-900 underline underline-offset-4 hover:text-forest-700"
+              >
+                Register interest
+              </Link>
+            </span>
           </p>
         </Reveal>
 
@@ -57,15 +66,15 @@ export function HowToJoin() {
               <div className="lg:col-span-7">
                 <p className="eyebrow text-gold-400">Founding cohort now forming</p>
                 <h3 className="font-display mt-4 text-[2rem] leading-[1.1] tracking-[-0.02em] text-balance sm:text-[2.75rem]">
-                  Register your interest with the Secretariat
+                  Complete the membership registration form
                 </h3>
                 <p className="mt-4 max-w-md text-[1.0625rem] leading-relaxed text-paper/70">
-                  Complete the short form and we will be in touch. Membership documentation follows
-                  once the Board finalises it.
+                  Fill it in online in about ten minutes. Have a passport photograph, your next of
+                  kin&rsquo;s details and your bank account number to hand.
                 </p>
                 <div className="mt-8 flex flex-col gap-3 xs:flex-row">
-                  <ButtonLink href="/join" size="lg" arrow>
-                    Register your interest
+                  <ButtonLink href="/join/register" size="lg" arrow>
+                    Apply for membership
                   </ButtonLink>
                   <ButtonLink href="/dashboard" size="lg" variant="inverse">
                     Explore My Anchor

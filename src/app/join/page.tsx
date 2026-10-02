@@ -3,7 +3,8 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Icon, type IconName } from "@/components/ui/Icons";
-import { email, joinSteps, offices, phones } from "@/lib/content";
+import { joinSteps } from "@/lib/content";
+import { ContactCard } from "./ContactCard";
 import { EnquiryForm } from "./EnquiryForm";
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 const facts: { icon: IconName; label: string; value: string }[] = [
-  { icon: "idcard", label: "Registration fee", value: "₦20,000 one-time" },
+  { icon: "idcard", label: "Registration fee", value: "₦10,000 one-time" },
   { icon: "grid", label: "Holding band", value: "100 – 10,000 slots" },
   { icon: "lock", label: "Today", value: "No payment taken" },
 ];
@@ -53,6 +54,16 @@ export default function JoinPage() {
             The Society is constituting a founding cohort of two hundred members. Tell us how to
             reach you and what kind of membership suits you, and the Secretariat will take it from
             there.
+          </p>
+          <p className="mt-5 text-[1rem] text-paper/85">
+            Ready to join now?{" "}
+            <Link
+              href="/join/register"
+              className="inline-flex items-center gap-1.5 font-semibold text-gold-300 underline decoration-gold-300/40 underline-offset-4 transition-colors hover:decoration-gold-300"
+            >
+              Complete the membership registration form
+              <Icon name="arrow-right" className="size-4" strokeWidth={2} />
+            </Link>
           </p>
 
           <dl className="mt-9 grid max-w-3xl gap-3 sm:grid-cols-3">
@@ -104,32 +115,7 @@ export default function JoinPage() {
                   </ol>
                 </div>
 
-                <div className="rounded-3xl bg-forest-950 p-6 text-paper sm:p-7">
-                  <h3 className="text-[1rem] font-semibold">Prefer to speak to someone?</h3>
-                  <div className="mt-4 space-y-2.5">
-                    {phones.map((phone) => (
-                      <a
-                        key={phone}
-                        href={`tel:${phone.replace(/\s/g, "")}`}
-                        className="flex items-center gap-3 text-[0.9375rem] text-paper/85 tnum transition-colors hover:text-gold-300"
-                      >
-                        <Icon name="phone" className="size-4 text-gold-400" />
-                        {phone}
-                      </a>
-                    ))}
-                    <a
-                      href={`mailto:${email.address}`}
-                      className="flex items-center gap-3 text-[0.9375rem] break-all text-paper/85 transition-colors hover:text-gold-300"
-                    >
-                      <Icon name="mail" className="size-4 shrink-0 text-gold-400" />
-                      {email.address}
-                    </a>
-                  </div>
-                  <p className="mt-5 flex gap-3 border-t border-white/10 pt-5 text-[0.875rem] leading-relaxed text-paper/60">
-                    <Icon name="map-pin" className="mt-0.5 size-4 shrink-0 text-gold-400" />
-                    {offices[0].lines.join(", ")}
-                  </p>
-                </div>
+                <ContactCard />
               </div>
             </aside>
           </div>

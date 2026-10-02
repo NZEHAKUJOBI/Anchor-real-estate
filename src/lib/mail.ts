@@ -1,10 +1,12 @@
 import { Types } from "mongoose";
 import nodemailer, { type Transporter } from "nodemailer";
 import type { EnquiryDoc } from "./models/Enquiry";
+import { registrantName, type RegistrationDoc } from "./models/Registration";
 import { MailMessage } from "./models/MailMessage";
 import { recordAudit } from "./models/AuditLog";
 import { connectDb } from "./db";
-import { SLOT_PRICE_KOBO } from "./constants";
+import { REGISTRATION_FEE_KOBO, SLOT_PRICE_KOBO } from "./constants";
+import { feeAccount, registrationSociety } from "./content";
 import { formatNaira, formatNumber } from "./money";
 
 /**
@@ -330,6 +332,104 @@ ${
   };
 }
 
+/* ── Membership registration ──────────────────────────────────────── */
+
+const dateOnlyFormat: Intl.DateTimeFormatOptions = {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+};
+
+/** Bank details go out by email, so only the last four digits are shown. */
+function maskAccount(accountNumber: string): string {
+  return `••••••${accountNumber.slice(-4)}`;
+}
+
+function registrationPairs(registration: RegistrationDoc): Array<[string, string]> {
+  return [
+    ["Reference", registration.reference],
+    ["Name", registrantName(registration)],
+    ["Department", registration.department],
+    ["Phone", registration.phone],
+    ["Email", registration.email],
+    ["Monthly contribution", formatNaira(registration.monthlyContributionKobo)],
+    [
+      "Contribution starts",
+      registration.contributionStartsOn.toLocaleDateString("en-GB", dateOnlyFormat),
+    ],
+    ["Bank", `${registration.bankName} · ${maskAccount(registration.accountNumber)}`],
+  ];
+}
+
+function feeInstruction(): string {
+  return `Pay the non-refundable registration fee of ${formatNaira(REGISTRATION_FEE_KOBO)} to ${feeAccount.bank}, ${feeAccount.accountName}, account number ${feeAccount.accountNumber}.`;
+}
+
+export function registrationReceipt(registration: RegistrationDoc): Mail {
+  const pairs = registrationPairs(registration);
+  const society = `${registrationSociety.name} ${registrationSociety.descriptor}`;
+
+  const text = `Dear ${registration.firstName},
+
+Thank you for completing the membership registration form of ${society}.
+
+Your registration is recorded under reference ${registration.reference}. Please quote it in any correspondence.
+
+What you submitted
+${plainPairs(pairs)}
+
+What happens next
+${feeInstruction()} If you have already paid, there is nothing more to do. The Secretariat will review your form and contact you.
+
+If any detail above is wrong, reply to this message and we will correct it.
+
+${society}
++234 902 525 0026 / +234 803 612 5057`;
+
+  const html = shell(
+    "We have your registration",
+    `<p style="margin:0 0 16px;">Dear ${escapeHtml(registration.firstName)},</p>
+<p style="margin:0 0 16px;">Thank you for completing the membership registration form of ${escapeHtml(society)}. Your registration is recorded under reference <strong>${escapeHtml(registration.reference)}</strong>. Please quote it in any correspondence.</p>
+<p style="margin:24px 0 0;font:600 11px/1.4 'Helvetica Neue',Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:${BRAND.gold};">What you submitted</p>
+${rows(pairs)}
+<p style="margin:24px 0 0;font:600 11px/1.4 'Helvetica Neue',Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:${BRAND.gold};">What happens next</p>
+<p style="margin:12px 0 16px;"><strong>${escapeHtml(feeInstruction())}</strong> If you have already paid, there is nothing more to do. The Secretariat will review your form and contact you.</p>
+<p style="margin:0;color:${BRAND.soft};">If any detail above is wrong, reply to this message and we will correct it.</p>`,
+  );
+
+  return {
+    subject: `Your membership registration — ${registration.reference}`,
+    text,
+    html,
+  };
+}
+
+export function registrationNotice(registration: RegistrationDoc): Mail {
+  const pairs = registrationPairs(registration);
+  const link = `${siteUrl()}/admin/registrations/${String(registration._id)}`;
+  const name = registrantName(registration);
+
+  const text = `New membership registration — ${registration.reference}
+
+${plainPairs(pairs)}
+
+Review it: ${link}`;
+
+  const html = shell(
+    "New membership registration",
+    `<p style="margin:0 0 16px;">A membership registration form was submitted through the public site.</p>
+${rows(pairs)}
+<p style="margin:24px 0 0;"><a href="${escapeHtml(link)}" style="display:inline-block;background:${BRAND.forest};color:${BRAND.paper};text-decoration:none;padding:13px 22px;font:600 11px/1 'Helvetica Neue',Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase;">Review in the Secretariat</a></p>`,
+  );
+
+  return {
+    subject: `New registration — ${name} (${registration.reference})`,
+    text,
+    html,
+  };
+}
+
 /* ── Sending ──────────────────────────────────────────────────────── */
 
 export type SendOutcome = { applicant: string; secretariat: string; error?: string };
@@ -340,8 +440,45 @@ export type SendOutcome = { applicant: string; secretariat: string; error?: stri
  * so the Secretariat can see when a receipt did not go out.
  */
 export async function sendEnquiryMail(enquiry: EnquiryDoc): Promise<SendOutcome> {
+  return sendReceiptAndNotice({
+    kind: "enquiry",
+    applicant: {
+      email: enquiry.email,
+      name: `${enquiry.firstName} ${enquiry.lastName}`,
+    },
+    receipt: applicantReceipt(enquiry),
+    notice: secretariatNotice(enquiry),
+  });
+}
+
+/** Same contract as sendEnquiryMail, for a membership registration. */
+export async function sendRegistrationMail(
+  registration: RegistrationDoc,
+): Promise<SendOutcome> {
+  return sendReceiptAndNotice({
+    kind: "registration",
+    applicant: {
+      email: registration.email,
+      name: `${registration.firstName} ${registration.surname}`,
+    },
+    receipt: registrationReceipt(registration),
+    notice: registrationNotice(registration),
+  });
+}
+
+async function sendReceiptAndNotice({
+  kind,
+  applicant,
+  receipt,
+  notice,
+}: {
+  kind: string;
+  applicant: { email: string; name: string };
+  receipt: Mail;
+  notice: Mail;
+}): Promise<SendOutcome> {
   if (!isMailConfigured()) {
-    console.warn("[mail] SMTP not configured — skipping enquiry mail");
+    console.warn(`[mail] SMTP not configured — skipping ${kind} mail`);
     return { applicant: "skipped", secretariat: "skipped" };
   }
 
@@ -351,26 +488,24 @@ export async function sendEnquiryMail(enquiry: EnquiryDoc): Promise<SendOutcome>
 
   const results = await Promise.allSettled([
     (async () => {
-      const message = applicantReceipt(enquiry);
       await sendMailMessage({
         from,
-        to: enquiry.email,
+        to: applicant.email,
         replyTo: secretariat,
-        subject: message.subject,
-        text: message.text,
-        html: message.html,
+        subject: receipt.subject,
+        text: receipt.text,
+        html: receipt.html,
       });
     })(),
     (async () => {
       if (!secretariat) return "skipped";
-      const message = secretariatNotice(enquiry);
       await sendMailMessage({
         from,
         to: secretariat,
-        replyTo: `${enquiry.firstName} ${enquiry.lastName} <${enquiry.email}>`,
-        subject: message.subject,
-        text: message.text,
-        html: message.html,
+        replyTo: `${applicant.name} <${applicant.email}>`,
+        subject: notice.subject,
+        text: notice.text,
+        html: notice.html,
       });
       return "sent";
     })(),
@@ -394,7 +529,7 @@ export async function sendEnquiryMail(enquiry: EnquiryDoc): Promise<SendOutcome>
 
   if (errors.length) {
     outcome.error = errors.join("; ");
-    console.error("[mail] enquiry mail problem", outcome.error);
+    console.error(`[mail] ${kind} mail problem`, outcome.error);
   }
 
   return outcome;

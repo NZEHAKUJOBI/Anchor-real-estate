@@ -48,7 +48,7 @@ export function SiteFooter() {
               “{society.tagline}”
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <ButtonLink href="/join" size="md" arrow>
+              <ButtonLink href="/join/register" size="md" arrow>
                 Become a member
               </ButtonLink>
               <ButtonLink href="/dashboard" size="md" variant="inverse">

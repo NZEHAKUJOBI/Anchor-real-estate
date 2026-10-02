@@ -26,7 +26,7 @@ export function AdminSidebar({
   return (
     <>
       {/* Compact bar, below lg */}
-      <div className="flex items-center justify-between border-b border-gold-500/25 bg-forest-950 px-5 py-3 lg:hidden">
+      <div className="flex items-center justify-between border-b border-gold-500/25 bg-forest-950 px-5 py-3 lg:hidden print:hidden">
         <Link href="/admin" className="flex items-center gap-3 text-paper">
           <Crest size={28} className="h-7 w-7" />
           <span className="label-sm">Anchor Admin</span>
@@ -58,7 +58,7 @@ export function AdminSidebar({
 
       <aside
         id="admin-nav"
-        className={`${open ? "block" : "hidden"} bg-forest-950 lg:sticky lg:top-0 lg:block lg:h-screen lg:w-64 lg:shrink-0`}
+        className={`${open ? "block" : "hidden"} bg-forest-950 lg:sticky lg:top-0 lg:block lg:h-screen lg:w-64 lg:shrink-0 print:hidden`}
       >
         <div className="flex h-full flex-col">
           <Link

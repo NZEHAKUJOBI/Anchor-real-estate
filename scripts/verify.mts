@@ -275,10 +275,113 @@ await check("allocates sequential enquiry references", async () => {
   assert.match(refs[0], /^ARG-INT-2026-\d{4}$/);
 });
 
+console.log("\nmembership registrations");
+const { Registration, nextRegistrationReference } = await import("../src/lib/models/Registration");
+const { registrationSchema, fieldErrorsOf } = await import("../src/lib/validation");
+const { sniffImageType } = await import("../src/lib/photo");
+await Registration.syncIndexes();
+
+const nextYear = new Date().getUTCFullYear() + 1;
+const baseRegistration = {
+  surname: "Okoro", firstName: "Ada", otherNames: "",
+  dateOfBirth: "1990-06-15", maritalStatus: "married",
+  officeAddress: "Plot 1, Central Business District, Abuja", department: "Finance",
+  phone: "+234 802 000 0000", email: "ada@example.org",
+  nokName: "Chidi Okoro", nokRelationship: "Spouse",
+  nokAddress: "Life Camp, Abuja", nokPhone: "0803 000 0000",
+  monthlyContribution: "10,000", contributionStartsOn: `${nextYear}-01-01`,
+  bankName: "Zenith Bank", accountNumber: "0123456789",
+  consentAppProfile: true, consentDigitalId: false, declaration: true,
+  signatureName: "Ada Okoro", witnessName: "", witnessAddress: "",
+};
+const registrationErrors = (overrides: Record<string, unknown>) => {
+  const result = registrationSchema.safeParse({ ...baseRegistration, ...overrides });
+  return result.success ? {} : fieldErrorsOf(result.error);
+};
+
+await check("accepts a complete registration", () => {
+  const result = registrationSchema.safeParse(baseRegistration);
+  assert.equal(result.success, true, JSON.stringify(result.error?.issues));
+  assert.equal(result.data?.monthlyContribution, 1_000_000);
+});
+await check("requires the declaration", () => {
+  assert.ok(registrationErrors({ declaration: false }).declaration);
+});
+await check("leaves the consents optional", () => {
+  assert.deepEqual(registrationErrors({ consentAppProfile: false, consentDigitalId: false }), {});
+});
+await check("requires a 10-digit account number", () => {
+  assert.ok(registrationErrors({ accountNumber: "12345" }).accountNumber);
+  assert.ok(registrationErrors({ accountNumber: "01234567AB" }).accountNumber);
+});
+await check("rejects a date of birth in the future", () => {
+  assert.ok(registrationErrors({ dateOfBirth: `${nextYear}-01-01` }).dateOfBirth);
+});
+await check("rejects a contribution starting in a past month", () => {
+  assert.ok(registrationErrors({ contributionStartsOn: "2020-01-01" }).contributionStartsOn);
+});
+await check("reports every missing field in one pass", () => {
+  const errors = registrationErrors({
+    surname: "", dateOfBirth: "", maritalStatus: "", nokPhone: "", declaration: false,
+  });
+  for (const field of ["surname", "dateOfBirth", "maritalStatus", "nokPhone", "declaration"]) {
+    assert.ok(errors[field], `no error for ${field}`);
+  }
+});
+await check("identifies photo formats from their bytes", () => {
+  assert.equal(sniffImageType(new Uint8Array([0xff, 0xd8, 0xff, 0xe0])), "image/jpeg");
+  assert.equal(sniffImageType(new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])), "image/png");
+  assert.equal(sniffImageType(new TextEncoder().encode("RIFF\0\0\0\0WEBPVP8 ")), "image/webp");
+  assert.equal(sniffImageType(new TextEncoder().encode("GIF89a")), null);
+  assert.equal(sniffImageType(new TextEncoder().encode("<svg onload=alert(1)>")), null);
+});
+await check("allocates sequential registration references", async () => {
+  const refs = await Promise.all(
+    Array.from({ length: 5 }, () => nextRegistrationReference(2026)),
+  );
+  assert.equal(new Set(refs).size, 5);
+  assert.match(refs[0], /^ARG-APP-2026-\d{4}$/);
+});
+
+const registrationDoc = await Registration.create({
+  reference: await nextRegistrationReference(2026),
+  surname: "Eze", firstName: "Ngozi", dateOfBirth: new Date("1988-03-02"),
+  maritalStatus: "single", officeAddress: "Wuye, Abuja", department: "Audit",
+  phone: "+2348090000001", email: "ngozi@applicant.test",
+  nextOfKin: { name: "Obi Eze", relationship: "Brother", address: "Wuye", phone: "+2348090000002" },
+  monthlyContributionKobo: 1_500_000, contributionStartsOn: new Date(`${nextYear}-01-01`),
+  bankName: "Access Bank", accountNumber: "0987654321",
+  consentAppProfile: true, consentDigitalId: true,
+  signatureName: "Ngozi Eze", declaredAt: new Date(),
+  photo: { data: Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3]), contentType: "image/jpeg", size: 7 },
+  status: "new",
+});
+
+await check("keeps the photo out of default queries", async () => {
+  const plain = await Registration.findById(registrationDoc._id).lean();
+  assert.equal(plain?.photo, undefined);
+  const withPhoto = await Registration.findById(registrationDoc._id).select("+photo");
+  assert.equal(withPhoto?.photo?.data.length, 7);
+  assert.equal(withPhoto?.photo?.contentType, "image/jpeg");
+});
+await check("refuses a registration without a photo", async () => {
+  const withoutPhoto = registrationDoc.toObject();
+  delete withoutPhoto.photo;
+  await assert.rejects(
+    Registration.create({ ...withoutPhoto, _id: undefined, reference: "ARG-APP-TEST-0001" }),
+  );
+});
+
 console.log("\noutbound mail (real SMTP)");
 const { SMTPServer } = await import("smtp-server");
-const { sendEnquiryMail, resetMailTransport, applicantReceipt, escapeHtml } =
-  await import("../src/lib/mail");
+const {
+  sendEnquiryMail,
+  sendRegistrationMail,
+  registrationReceipt,
+  resetMailTransport,
+  applicantReceipt,
+  escapeHtml,
+} = await import("../src/lib/mail");
 
 type Captured = { from: string; to: string[]; body: string };
 const captured: Captured[] = [];
@@ -368,6 +471,36 @@ await check("skips sending when SMTP is not configured", async () => {
   assert.equal(skipped.secretariat, "skipped");
   process.env.SMTP_HOST = host;
   resetMailTransport();
+});
+
+const registrationPlain = (await Registration.findById(registrationDoc._id).lean())!;
+const sentBefore = captured.length;
+const registrationOutcome = await sendRegistrationMail(registrationPlain);
+
+await check("sends the registration receipt and notice", () => {
+  assert.equal(registrationOutcome.applicant, "sent", registrationOutcome.error);
+  assert.equal(registrationOutcome.secretariat, "sent", registrationOutcome.error);
+  const fresh = captured.slice(sentBefore);
+  assert.equal(fresh.length, 2);
+  const receipt = fresh.find((m) => m.to.includes("ngozi@applicant.test"));
+  assert.ok(receipt, "no receipt addressed to the applicant");
+  // The em dash makes the Subject header encoded-word, split across lines.
+  assert.match(receipt.body, /Subject: =\?UTF-8\?Q\?Your_membership_registration/);
+  assert.match(receipt.body, /reference ARG-APP-2026-\d{4}/);
+  const notice = fresh.find((m) => m.to.includes("office@anchor.test"));
+  assert.ok(notice, "no notice addressed to the Secretariat");
+  assert.match(notice.body.replace(/=\r?\n/g, ""), /admin\/registrations\//);
+});
+await check("quotes the fee account and masks the applicant's account", () => {
+  const mail = registrationReceipt(registrationPlain);
+  assert.match(mail.text, /1052083039/);
+  assert.match(mail.text, /₦10,000/);
+  assert.ok(!mail.text.includes("0987654321"), "full account number in the email");
+  assert.match(mail.text, /4321/);
+});
+await check("escapes registrant-supplied HTML", () => {
+  const mail = registrationReceipt({ ...registrationPlain, firstName: "<img src=x onerror=alert(1)>" });
+  assert.ok(!mail.html.includes("<img src=x"), "raw tag reached the HTML body");
 });
 
 await new Promise<void>((resolve) => smtp.close(() => resolve()));

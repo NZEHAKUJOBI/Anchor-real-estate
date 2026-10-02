@@ -140,7 +140,7 @@ export const glanceFigures = [
   { value: "₦5,000", label: "Price per ownership slot" },
   { value: "200", label: "Initial membership target" },
   { value: "₦500K–₦50M", label: "Min–max member holding" },
-  { value: "₦20,000", label: "Registration fee" },
+  { value: "₦10,000", label: "Registration fee" },
   { value: "₦10,000", label: "Monthly dues — investor" },
 ];
 
@@ -235,9 +235,9 @@ export const holdingBand = {
 
 export const fees = [
   {
-    amount: "₦20,000",
+    amount: "₦10,000",
     label: "Registration fee",
-    detail: "One-time, payable on application.",
+    detail: "One-time and non-refundable, payable on application.",
   },
   {
     amount: "₦10,000",
@@ -345,7 +345,7 @@ export const responsibility = {
 export const joinSteps = [
   {
     title: "Pay the registration fee",
-    body: "A one-time payment of ₦20,000 opens your membership file.",
+    body: "A one-time, non-refundable payment of ₦10,000 opens your membership file.",
   },
   {
     title: "Commit to monthly dues",
@@ -356,13 +356,29 @@ export const joinSteps = [
     body: "Take between 100 and 10,000 ownership slots, or join on the non-investor tier.",
   },
   {
-    title: "Complete documentation",
-    body: "Membership forms are signed once the Society finalises them.",
+    title: "Complete the registration form",
+    body: "Fill in the membership registration form online, with a recent passport photograph.",
   },
 ];
 
 export const joinCaveat =
-  "Detailed eligibility criteria and standard application forms are still being developed. Registrations of interest are being recorded in the meantime.";
+  "Not ready to apply? Register your interest instead, and the Secretariat will contact you.";
+
+/* ── Membership registration form ─────────────────────────────────── */
+
+/** The Society's name as it is set on the registration form itself. */
+export const registrationSociety = {
+  name: "Anchor Real Estate Group",
+  descriptor: "Cooperative Society Limited",
+  formTitle: "Membership Registration Form",
+};
+
+/** Where the registration fee is paid, as printed on the form. */
+export const feeAccount = {
+  bank: "First City Monument Bank (FCMB)",
+  accountName: "Anchor Real Estate Group Cooperative",
+  accountNumber: "1052083039",
+};
 
 /* ── Contact ──────────────────────────────────────────────────────── */
 

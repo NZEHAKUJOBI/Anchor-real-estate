@@ -1,6 +1,7 @@
 import { z, type ZodError } from "zod";
 import {
   BANKS,
+  MARITAL_STATUSES,
   MAX_INVESTOR_SLOTS,
   MEMBER_STATUSES,
   MEMBER_TIERS,
@@ -176,6 +177,92 @@ export const enquirySchema = z
     }
   });
 
+const phoneNumber = trimmed
+  .min(7, "Enter a phone number.")
+  .max(24)
+  .regex(/^[+\d][\d\s-]*$/, "Enter a valid phone number.");
+
+function startOfThisMonth(): Date {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+}
+
+/**
+ * The membership registration form. Fields are flat because they arrive flat
+ * from FormData; the action nests next of kin and witness for storage. The
+ * passport photograph is checked separately — it is a File, not text.
+ */
+export const registrationSchema = z.object({
+  surname: trimmed.min(1, "Enter your surname.").max(80),
+  firstName: trimmed.min(1, "Enter your first name.").max(80),
+  otherNames: trimmed.max(80).optional().or(z.literal("")),
+  dateOfBirth: dateOnly.refine(
+    (date) =>
+      date < new Date() && date >= new Date("1900-01-01T00:00:00.000Z"),
+    "Enter your real date of birth.",
+  ),
+  maritalStatus: z.enum(MARITAL_STATUSES, "Choose your marital status."),
+  officeAddress: trimmed.min(1, "Enter your office address.").max(300),
+  department: trimmed.min(1, "Enter your office location or department.").max(120),
+  phone: phoneNumber,
+  email: trimmed
+    .min(1, "Enter your email.")
+    .pipe(z.email("Enter a valid email address.")),
+  nokName: trimmed.min(1, "Enter your next of kin's name.").max(120),
+  nokRelationship: trimmed.min(1, "Enter how they are related to you.").max(60),
+  nokAddress: trimmed.min(1, "Enter your next of kin's address.").max(300),
+  nokPhone: phoneNumber,
+  monthlyContribution: nairaAmount,
+  // A salary deduction cannot start in a month that has already been paid.
+  contributionStartsOn: dateOnly.refine(
+    (date) => date >= startOfThisMonth(),
+    "Choose a date in this month or later.",
+  ),
+  bankName: trimmed.min(2, "Enter your bank's name.").max(80),
+  accountNumber: trimmed.regex(/^\d{10}$/, "Enter your 10-digit account number."),
+  consentAppProfile: z.boolean(),
+  consentDigitalId: z.boolean(),
+  declaration: z.literal(true, "Tick the declaration to continue."),
+  signatureName: trimmed
+    .min(3, "Type your full name as your signature.")
+    .max(160),
+  witnessName: trimmed.max(120).optional().or(z.literal("")),
+  witnessAddress: trimmed.max(300).optional().or(z.literal("")),
+});
+
+export const registrationReviewSchema = z
+  .object({
+    registrationId: trimmed.min(1),
+    decision: z.enum(["reviewing", "approved", "declined"]),
+    appProfileCreated: z.enum(["", "yes", "no"]),
+    tier: z.enum(MEMBER_TIERS).optional(),
+    slots: z.coerce.number().int("Slots must be a whole number.").optional(),
+    reviewNote: trimmed.max(1000).optional().or(z.literal("")),
+  })
+  .superRefine((value, ctx) => {
+    // The registration form does not ask for a tier, so the officer sets it
+    // when approving. Outside an approval these fields are not submitted.
+    if (value.decision !== "approved" || !value.tier) return;
+
+    const slots = value.slots ?? 0;
+
+    if (value.tier === "investor") {
+      if (slots < MIN_INVESTOR_SLOTS || slots > MAX_INVESTOR_SLOTS) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["slots"],
+          message: `An investing member holds ${MIN_INVESTOR_SLOTS.toLocaleString()} to ${MAX_INVESTOR_SLOTS.toLocaleString()} slots.`,
+        });
+      }
+    } else if (slots !== 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["slots"],
+        message: "A non-investor member holds no slots.",
+      });
+    }
+  });
+
 export const enquiryReviewSchema = z.object({
   enquiryId: trimmed.min(1),
   decision: z.enum(["reviewing", "approved", "declined"]),
@@ -195,3 +282,4 @@ export const adminUserSchema = z.object({
 export type MemberInput = z.infer<typeof memberSchema>;
 export type PaymentInput = z.infer<typeof paymentSchema>;
 export type AdminUserInput = z.infer<typeof adminUserSchema>;
+export type RegistrationInput = z.infer<typeof registrationSchema>;

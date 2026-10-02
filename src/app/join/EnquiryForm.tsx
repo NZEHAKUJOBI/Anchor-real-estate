@@ -16,43 +16,7 @@ import {
 } from "@/lib/constants";
 import { formatNaira } from "@/lib/money";
 import { submitEnquiry, type EnquiryFormState } from "./actions";
-
-const control =
-  "w-full rounded-xl border border-forest-900/15 bg-white px-3.5 py-3 text-[0.9375rem] text-ink placeholder:text-ink-faint/80 transition-colors focus:border-forest-700 focus:ring-2 focus:ring-forest-700/15 focus:outline-none aria-[invalid=true]:border-alert/60";
-
-function Field({
-  label,
-  name,
-  error,
-  hint,
-  required,
-  children,
-}: {
-  label: string;
-  name: string;
-  error?: string;
-  hint?: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <label htmlFor={name} className="block text-[0.875rem] font-medium text-ink">
-        {label}
-        {required ? <span className="text-alert"> *</span> : null}
-      </label>
-      <div className="mt-2">{children}</div>
-      {error ? (
-        <p className="mt-2 flex items-center gap-1.5 text-[0.8125rem] text-alert">
-          <Icon name="info" className="size-4 shrink-0" />
-          {error}
-        </p>
-      ) : hint ? (
-        <p className="mt-2 text-[0.8125rem] text-ink-faint">{hint}</p>
-      ) : null}
-    </div>
-  );
-}
+import { Field, Legend, control } from "./fields";
 
 function Submit() {
   const { pending } = useFormStatus();
@@ -67,17 +31,6 @@ function Submit() {
       {pending ? "Submitting…" : "Register my interest"}
       {pending ? null : <Icon name="arrow-right" className="size-4" strokeWidth={2} />}
     </button>
-  );
-}
-
-function Legend({ step, children }: { step: number; children: React.ReactNode }) {
-  return (
-    <legend className="flex items-center gap-3">
-      <span className="flex size-7 items-center justify-center rounded-full bg-forest-900 text-[0.8125rem] font-semibold text-gold-300">
-        {step}
-      </span>
-      <span className="font-display text-[1.375rem] text-forest-900">{children}</span>
-    </legend>
   );
 }
 
@@ -272,9 +225,17 @@ export function EnquiryForm() {
       <div className="border-t border-forest-900/[0.08] pt-8">
         <p className="mb-6 flex max-w-xl gap-3 text-[0.875rem] leading-relaxed text-ink-soft">
           <Icon name="shield" className="mt-0.5 size-5 shrink-0 text-forest-600" />
-          Submitting this form registers your interest only. It does not create membership and
-          commits you to no payment. The Society will send the formal documentation once the
-          Board has adopted it.
+          <span>
+            Submitting this form registers your interest only. It does not create membership and
+            commits you to no payment. Ready to join?{" "}
+            <Link
+              href="/join/register"
+              className="font-medium text-forest-900 underline underline-offset-4 hover:text-forest-700"
+            >
+              Complete the membership registration form
+            </Link>
+            .
+          </span>
         </p>
         <Submit />
       </div>

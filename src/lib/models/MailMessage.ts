@@ -19,6 +19,7 @@ export type MailMessageDoc = {
   isRead: boolean;
   member?: Types.ObjectId;
   enquiry?: Types.ObjectId;
+  registration?: Types.ObjectId;
   sentBy?: {
     id: Types.ObjectId;
     name: string;
@@ -55,6 +56,7 @@ const MailMessageSchema = new Schema<MailMessageDoc>(
     isRead: { type: Boolean, default: false },
     member: { type: Schema.Types.ObjectId, ref: "Member" },
     enquiry: { type: Schema.Types.ObjectId, ref: "Enquiry" },
+    registration: { type: Schema.Types.ObjectId, ref: "Registration" },
     sentBy: {
       id: { type: Schema.Types.ObjectId, ref: "AdminUser" },
       name: { type: String },

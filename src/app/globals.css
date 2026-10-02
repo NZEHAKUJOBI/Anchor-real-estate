@@ -306,6 +306,18 @@
   }
 }
 
+/* Printed registration forms are laid out for A4. */
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  body {
+    background-color: #fff;
+  }
+}
+
 /* Scroll reveal — deliberately small travel; disabled under reduced motion. */
 @layer utilities {
   .reveal {

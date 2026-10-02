@@ -324,7 +324,7 @@ export function SiteHeader() {
 
           <div className="flex items-center gap-2">
             <ButtonLink
-              href="/join"
+              href="/join/register"
               size="sm"
               className="max-sm:hidden lg:h-10 lg:px-4 lg:text-[0.875rem] xl:px-5"
             >
@@ -407,7 +407,7 @@ export function SiteHeader() {
             </ul>
 
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              <ButtonLink href="/join" size="lg" arrow onClick={closeAll}>
+              <ButtonLink href="/join/register" size="lg" arrow onClick={closeAll}>
                 Become a member
               </ButtonLink>
               <ButtonLink href="/dashboard" size="lg" variant="inverse" onClick={closeAll}>

@@ -10,7 +10,7 @@ export const TOTAL_SLOT_POOL = 1_000_000;
 export const MIN_INVESTOR_SLOTS = 100; // ₦500,000
 export const MAX_INVESTOR_SLOTS = 10_000; // ₦50,000,000 — 1% of the pool
 
-export const REGISTRATION_FEE_KOBO = 2_000_000; // ₦20,000
+export const REGISTRATION_FEE_KOBO = 1_000_000; // ₦10,000, non-refundable
 export const DUES_INVESTOR_KOBO = 1_000_000; // ₦10,000 / month
 export const DUES_NON_INVESTOR_KOBO = 5_000_000; // ₦50,000 / month
 
@@ -74,6 +74,33 @@ export const ENQUIRY_STATUS_LABEL: Record<EnquiryStatus, string> = {
   approved: "Approved",
   declined: "Declined",
 };
+
+/* Membership registration form vocabulary. A registration moves through the
+   same four review states as an enquiry, so it reuses ENQUIRY_STATUSES. */
+export const MARITAL_STATUSES = [
+  "single",
+  "married",
+  "divorced",
+  "widowed",
+  "separated",
+] as const;
+export type MaritalStatus = (typeof MARITAL_STATUSES)[number];
+
+export const MARITAL_STATUS_LABEL: Record<MaritalStatus, string> = {
+  single: "Single",
+  married: "Married",
+  divorced: "Divorced",
+  widowed: "Widowed",
+  separated: "Separated",
+};
+
+/**
+ * Passport photographs are downscaled in the browser to well under this; the
+ * ceiling is the server's guard against anything that skipped that step.
+ */
+export const PHOTO_MAX_BYTES = 2 * 1024 * 1024;
+export const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
+export type PhotoType = (typeof PHOTO_TYPES)[number];
 
 export const TIER_LABEL: Record<MemberTier, string> = {
   investor: "Investing member",

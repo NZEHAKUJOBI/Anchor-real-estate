@@ -4,6 +4,7 @@ import { requireSession } from "@/lib/auth";
 import { can } from "@/lib/rbac";
 import { connectDb } from "@/lib/db";
 import { MailMessage } from "@/lib/models/MailMessage";
+import { Registration } from "@/lib/models/Registration";
 import { signOut } from "../login/actions";
 
 export const metadata: Metadata = {
@@ -21,14 +22,16 @@ export default async function AdminLayout({
 }) {
   const session = await requireSession();
 
-  let unreadMailCount = 0;
-  if (can(session.role, "mail:read")) {
-    await connectDb();
-    unreadMailCount = await MailMessage.countDocuments({
-      direction: "inbound",
-      isRead: false,
-    });
-  }
+  await connectDb();
+
+  const [unreadMailCount, newRegistrationCount] = await Promise.all([
+    can(session.role, "mail:read")
+      ? MailMessage.countDocuments({ direction: "inbound", isRead: false })
+      : 0,
+    can(session.role, "enquiries:read")
+      ? Registration.countDocuments({ status: "new" })
+      : 0,
+  ]);
 
   const items: NavItem[] = [
     { href: "/admin", label: "Overview" },
@@ -39,7 +42,14 @@ export default async function AdminLayout({
       ? [{ href: "/admin/payments", label: "Payments" }]
       : []),
     ...(can(session.role, "enquiries:read")
-      ? [{ href: "/admin/applications", label: "Enquiries" }]
+      ? [
+          {
+            href: "/admin/registrations",
+            label: "Registrations",
+            badge: newRegistrationCount > 0 ? newRegistrationCount : undefined,
+          },
+          { href: "/admin/applications", label: "Enquiries" },
+        ]
       : []),
     ...(can(session.role, "mail:read")
       ? [
@@ -59,9 +69,9 @@ export default async function AdminLayout({
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-paper lg:flex-row">
+    <div className="flex min-h-screen flex-col bg-paper lg:flex-row print:block print:min-h-0 print:bg-white">
       <AdminSidebar items={items} user={session} signOut={signOut} />
-      <main className="min-w-0 flex-1 px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
+      <main className="min-w-0 flex-1 px-5 py-8 sm:px-8 lg:px-12 lg:py-12 print:p-0">
         {children}
       </main>
     </div>
