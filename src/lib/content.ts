@@ -140,7 +140,7 @@ export const glanceFigures = [
   { value: "₦5,000", label: "Price per ownership slot" },
   { value: "200", label: "Initial membership target" },
   { value: "₦500K–₦50M", label: "Min–max member holding" },
-  { value: "₦10,000", label: "Registration fee" },
+  { value: "₦20,000", label: "Registration fee" },
   { value: "₦10,000", label: "Monthly dues — investor" },
 ];
 
@@ -235,7 +235,7 @@ export const holdingBand = {
 
 export const fees = [
   {
-    amount: "₦10,000",
+    amount: "₦20,000",
     label: "Registration fee",
     detail: "One-time and non-refundable, payable on application.",
   },
@@ -345,7 +345,7 @@ export const responsibility = {
 export const joinSteps = [
   {
     title: "Pay the registration fee",
-    body: "A one-time, non-refundable payment of ₦10,000 opens your membership file.",
+    body: "A one-time, non-refundable payment of ₦20,000 opens your membership file.",
   },
   {
     title: "Commit to monthly dues",
@@ -408,7 +408,6 @@ export const email = { address: "info@anchorcooperativeltd.com", provisional: fa
 export const bankers = [
   { name: "First City Monument Bank", short: "FCMB" },
   { name: "Federal Mortgage Bank of Nigeria", short: "FMBN" },
-  { name: "Guaranty Trust Bank", short: "GTBank" },
 ];
 
 export const sourceNote =

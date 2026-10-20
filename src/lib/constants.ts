@@ -10,7 +10,7 @@ export const TOTAL_SLOT_POOL = 1_000_000;
 export const MIN_INVESTOR_SLOTS = 100; // ₦500,000
 export const MAX_INVESTOR_SLOTS = 10_000; // ₦50,000,000 — 1% of the pool
 
-export const REGISTRATION_FEE_KOBO = 1_000_000; // ₦10,000, non-refundable
+export const REGISTRATION_FEE_KOBO = 2_000_000; // ₦20,000, non-refundable
 export const DUES_INVESTOR_KOBO = 1_000_000; // ₦10,000 / month
 export const DUES_NON_INVESTOR_KOBO = 5_000_000; // ₦50,000 / month
 
@@ -18,7 +18,7 @@ export const DUES_NON_INVESTOR_KOBO = 5_000_000; // ₦50,000 / month
 export const CAPITAL_TARGET_KOBO = TOTAL_SLOT_POOL * SLOT_PRICE_KOBO;
 export const MEMBERSHIP_TARGET = 200;
 
-export const BANKS = ["FCMB", "FMBN", "GTBank", "Other"] as const;
+export const BANKS = ["FCMB", "FMBN", "Other"] as const;
 export type Bank = (typeof BANKS)[number];
 
 export const MEMBER_TIERS = ["investor", "non_investor"] as const;

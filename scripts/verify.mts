@@ -117,7 +117,7 @@ await check("rejects a duplicate member email", async () => {
 
 await Payment.create({
   member: memberOne._id, kind: "registration", amountKobo: 2_000_000,
-  method: "bank_transfer", bank: "GTBank", receivedOn: new Date("2026-06-20T00:00:00Z"),
+  method: "bank_transfer", bank: "FCMB", receivedOn: new Date("2026-06-20T00:00:00Z"),
   recordedBy: new mongoose.Types.ObjectId(), recordedByName: "Treasurer",
 });
 await Payment.create({

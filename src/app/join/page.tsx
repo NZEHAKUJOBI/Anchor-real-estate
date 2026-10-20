@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 const facts: { icon: IconName; label: string; value: string }[] = [
-  { icon: "idcard", label: "Registration fee", value: "₦10,000 one-time" },
+  { icon: "idcard", label: "Registration fee", value: "₦20,000 one-time" },
   { icon: "grid", label: "Holding band", value: "100 – 10,000 slots" },
   { icon: "lock", label: "Today", value: "No payment taken" },
 ];
