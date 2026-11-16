@@ -368,15 +368,7 @@ export const joinCaveat =
 
 export const offices = [
   {
-    label: "Registered address",
-    lines: [
-      "124 Sherifat Adenusi Crescent",
-      "ACO Estate, Life Camp",
-      "Abuja–FCT",
-    ],
-  },
-  {
-    label: "Alternative office",
+    label: "Office address",
     lines: [
       "1004 Ameh Ebute Street, Suite D-14",
       "Boya Place Plaza, Wuye",

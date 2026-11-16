@@ -29,7 +29,7 @@ const organisationSchema = {
   foundingDate: society.established,
   address: {
     "@type": "PostalAddress",
-    streetAddress: "124 Sherifat Adenusi Crescent, ACO Estate, Life Camp",
+    streetAddress: "1004 Ameh Ebute Street, Suite D-14, Boya Place Plaza, Wuye",
     addressLocality: "Abuja",
     addressRegion: "Federal Capital Territory",
     addressCountry: "NG",

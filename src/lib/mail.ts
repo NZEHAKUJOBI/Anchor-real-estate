@@ -199,7 +199,7 @@ export function shell(heading: string, body: string): string {
   </td></tr>
   <tr><td style="padding:20px 32px;border-top:1px solid ${BRAND.rule};font:400 12px/1.6 'Helvetica Neue',Arial,sans-serif;color:${BRAND.soft};">
     Anchor Real Estate Group — Multipurpose Cooperative Society Limited<br>
-    124 Sherifat Adenusi Crescent, ACO Estate, Life Camp, Abuja–FCT<br>
+    1004 Ameh Ebute Street, Suite D-14, Boya Place Plaza, Wuye, Abuja–FCT<br>
     Tier 1 Cooperative · FCTA By-Laws No. R11913
   </td></tr>
 </table>
